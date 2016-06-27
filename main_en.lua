@@ -51,12 +51,12 @@ global {
 
 intro = room {
     nam = 'Intro',
-    dsc = [[You're on maintenace duty aboard the USS Sea Moss, patrolling the icy North Atlantic waters
+    dsc = [[You're on maintenance duty aboard the USS Sea Moss, patrolling the icy North Atlantic waters
             with an arsenal of twenty nuclear missiles. ^^
 
-            The Sea Moss is no ordianry sub. She's the first to carry the Navy's new experimental sonar-
-            jammer that can make her "invisible" to even the most sophisticated enemy sensors. The 50-
-            kiloton cruisers in her missile bay are the pride of the Pentagon: fast, silent, incredibly
+            The Sea Moss is no ordinary sub. She's the first to carry the Navy's new experimental 
+            sonar-jammer that can make her "invisible" to even the most sophisticated enemy sensors. The 
+            50-kiloton cruisers in her missile bay are the pride of the Pentagon: fast, silent, incredibly
             accurate. ^^
 
             The enemy would love to get their hands on the Sea Moss and her secrets. It's not likely
@@ -109,7 +109,7 @@ mouth = obj {
             gl_holdbreathtimer = 0
             p [[It feels so good to breath again]]
         else
-            gl_holdbreathtimer = 4
+            gl_holdbreathtimer = 10
             lifeon(s,3)
             p [[You hold your breath]]
         end
@@ -125,10 +125,21 @@ mouth = obj {
     end,
 };
 
+nose = obj {
+    nam = '(My Nose)',
+    inv = function(s)
+        if have(gas_mask) then
+            p [[You can't smell anything because of the gas mask.]]
+        else
+            p [[There is a smell of oil on your hands.]]
+        end
+    end,
+};
+
 poison = obj {
     nam = 'Poison',
     life = function(s)
-        if gl_holdbreathtimer == 0 then
+        if gl_holdbreathtimer == 0 and not have(gas_mask) then
             walkin('dead')
             p "A cloud of poisonous gas kills you instantly!"
         end
@@ -150,6 +161,7 @@ screwdriver = obj {
 function init()
     take(eyes); 
     take(ears); 
+    take(nose);
     take(mouth); 
     take(feet); 
 end; 
@@ -161,8 +173,8 @@ dead = room {
 
 escape_tube = room {
     forcedsc = true,
-    nam = 'Escape Tube',
-    dsc = [[You are in the Escape Tube. There is a {hatch|hatch} in the floor. It has a {hatch_handle|handle} to open it.]],
+    nam = 'Escape tube',
+    dsc = [[You are in the escape tube. There is a {hatch|hatch} in the floor. It has a {hatch_handle|handle} to open it.]],
     obj = { 
         xact('hatch', 'It is airtight'),
         xact('hatch_handle', code[[
@@ -185,7 +197,7 @@ escape_tube = room {
 
 
 forward_passage = room {
-    nam = 'Forward Passage',
+    nam = 'Forward passage',
     dsc = [[forward_passage]],
     way = {
         vroom('Up', 'escape_tube'),
@@ -194,12 +206,44 @@ forward_passage = room {
 }
 
 crews_quarters = room {
-    nam = 'Crews Quarters',
+    nam = 'Crews quarters',
     dsc = [[crews_quarters]],
     way = {
         vroom('Up', 'forward_passage'),
+        'torpedo_room', -- N
     },
 }
 
+torpedo_room = room {
+    nam = 'Torpedo room',
+    way = {
+        'crews_quarters', -- S
+        'weapons_locker', -- E
+    },
+}
 
+weapons_locker = room {
+    nam = 'Weapons locker',
+    obj = {
+        'gas_mask',
+    },
+    way = {
+        'torpedo_room', -- W
+    },
+}
 
+gas_mask = obj {
+    nam = 'Gas mask',
+    dsc = code[[
+        if here() == weapons_locker then
+            p 'There is a {Gas mask} in an open locker.'
+        else
+            p 'There is a {Gas mask} on the floor.'
+        end
+    ]],
+    tak = 'You wear the Gas mask',
+    inv = function (s)
+        drop(s)
+        p 'You drop the Gas mask'
+    end,
+}
