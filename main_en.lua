@@ -333,13 +333,20 @@ command_station = room {
     way = {
         vroom('Down', 'missile_control'),--command_station
         'long_corridor', -- N
+        'ballast_control', -- W
     },
 }
 
 periscope = obj {
     nam = 'Periscope',
     dsc = 'there is a {periscope} coming out of the roof.',
-    act = 'The enemy is approaching!!!!!!!!!',
+    act = function(s)
+        if depth_gauge.depth == 0 then
+            p(txtb('^The enemy is approaching!!!!!!!!!^'))
+        else
+            p 'You can only see water'
+        end
+    end,
 }
 
 enemy = obj {
@@ -352,12 +359,60 @@ enemy = obj {
             s.timer = s.timer - 1
         end
         -- p(tostring(s.timer))
-        if s.timer == 0 then
+        -- p(tostring(depth_gauge.depth))
+        if s.timer == 0 and depth_gauge.depth == 0 then
             if here() ~= dead then
                 walkin('dead')
                 p "The enemy captures the sub and kills you instantly!"
             end
         end
     end,
+}
+
+ballast_control = room {
+    nam = "Ballast control",
+    obj = {
+        'depth_gauge',
+        'red_button',
+    },
+    way = {
+        'command_station', -- E
+    }
+}
+
+depth_gauge = obj {
+    var {
+        depth = 0,
+    },
+    nam = 'Depth gauge',
+    dsc = 'There is a {depth gauge} at the wall',
+    act = function(s)
+        p(tostring(s.depth)..' fathoms') 
+    end,
+    life = function(s)
+        if s.depth < 128 then
+            s.depth = s.depth + 8
+            if s.depth == 128 then
+                lifeoff(s)
+                p(txtb('BANG!')..' sub hits bottom')
+            end
+        end
+    end,
+}
+
+red_button = obj {
+    nam = 'Red button',
+    dsc = 'with a {Red button} next to it.',
+    act = code[[
+        if depth_gauge.depth == 128 then
+            p 'nothing happens'
+        elseif live(depth_gauge) then
+            lifeoff(depth_gauge)
+            p 'sub levels off'
+        else
+            lifeon(depth_gauge, 8)
+            p 'sub dives'
+        end
+    ]],
 }
 
