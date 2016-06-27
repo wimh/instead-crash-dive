@@ -211,6 +211,7 @@ crews_quarters = room {
     way = {
         vroom('Up', 'forward_passage'),
         'torpedo_room', -- N
+        'shower_stalls', -- W
     },
 }
 
@@ -247,3 +248,33 @@ gas_mask = obj {
         p 'You drop the Gas mask'
     end,
 }
+
+shower_stalls = room {
+    nam = 'Shower stalls',
+    obj = {
+        'grate',
+        'shampoo',
+    },
+    way = {
+        'crews_quarters', -- E
+    },
+}
+
+grate = obj {
+    nam = 'Grate',
+    dsc = 'there is a {grate} on the astern wall',
+    act = 'it is screwed in place',
+    used = function(s, w)
+        if w == screwdriver then
+            p "You can't unscrew it, the screwdriver is too tiny."
+        end
+    end,
+}
+
+shampoo = obj {
+    nam = 'Shampoo',
+    dsc = 'There is a bottle of {shampoo}',
+    tak = 'You take the bottle',
+    inv = 'Looks like normal shampoo',
+}
+    
