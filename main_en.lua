@@ -110,13 +110,14 @@ mouth = obj {
             p [[It feels so good to breath again]]
         else
             gl_holdbreathtimer = 10
-            lifeon(s,3)
+            lifeon(s, 3)
             p [[You hold your breath]]
         end
     end,
     life = function(s)
         if gl_holdbreathtimer > 0 then
             gl_holdbreathtimer = gl_holdbreathtimer - 1
+            -- p(tostring(gl_holdbreathtimer))
             if gl_holdbreathtimer == 0 then
                 lifeoff(s)
                 p [[You are no longer able to hold your breath.]]
@@ -140,8 +141,10 @@ poison = obj {
     nam = 'Poison',
     life = function(s)
         if gl_holdbreathtimer == 0 and not have(gas_mask) then
-            walkin('dead')
-            p "A cloud of poisonous gas kills you instantly!"
+            if here() ~= dead then
+                walkin('dead')
+                p "A cloud of poisonous gas kills you instantly!"
+            end
         end
     end,
 }
@@ -163,7 +166,8 @@ function init()
     take(ears); 
     take(nose);
     take(mouth); 
-    take(feet); 
+    take(feet);
+    lifeon(enemy, 6);
 end; 
 
 dead = room {
@@ -184,7 +188,7 @@ escape_tube = room {
             else
                 p "You open the hatch."
                 path('Down'):enable()
-                lifeon(poison,9)
+                lifeon(poison, 5)
             end
         ]]),
         'screwdriver',
@@ -202,6 +206,7 @@ forward_passage = room {
     way = {
         vroom('Up', 'escape_tube'),
         vroom('Down', 'crews_quarters'),
+        'long_corridor', -- S
     },
 }
 
@@ -211,6 +216,7 @@ crews_quarters = room {
     way = {
         vroom('Up', 'forward_passage'),
         'torpedo_room', -- N
+        'missile_control', -- S
         'shower_stalls', -- W
     },
 }
@@ -277,4 +283,81 @@ shampoo = obj {
     tak = 'You take the bottle',
     inv = 'Looks like normal shampoo',
 }
-    
+
+missile_control = room {
+    nam = "Missile control",
+    obj = {
+    },
+    way = {
+        vroom('Up', 'command_station'),
+        'crews_quarters', -- N
+        'equipment_bay', -- E
+    },
+}
+
+equipment_bay = room {
+    nam = 'Equipment bay',
+    obj = {
+        'radiation_suit',
+    },
+    way = {
+        'missile_control', -- W
+    },
+}
+
+radiation_suit = obj {
+    nam = 'Radiation suit',
+    dsc = 'There is a {radiation suit}',
+    tak = 'You wear the radiation suit',
+    inv = function (s)
+        drop(s) -- todo different action ;)
+        p 'You drop the radiation suit'
+    end,
+}
+
+long_corridor = room {
+    nam = 'Long corridor',
+    obj = {
+    },
+    way = {
+        'forward_passage', -- N
+        'command_station', -- S
+    },
+}
+
+command_station = room {
+    nam = 'Command station',
+    obj = {
+        'periscope',
+    },
+    way = {
+        vroom('Down', 'missile_control'),--command_station
+        'long_corridor', -- N
+    },
+}
+
+periscope = obj {
+    nam = 'Periscope',
+    dsc = 'there is a {periscope} coming out of the roof.',
+    act = 'The enemy is approaching!!!!!!!!!',
+}
+
+enemy = obj {
+    var {
+        timer = 30,
+    },
+    nam = 'Enemy',
+    life = function(s)
+        if s.timer > 0 then
+            s.timer = s.timer - 1
+        end
+        -- p(tostring(s.timer))
+        if s.timer == 0 then
+            if here() ~= dead then
+                walkin('dead')
+                p "The enemy captures the sub and kills you instantly!"
+            end
+        end
+    end,
+}
+
