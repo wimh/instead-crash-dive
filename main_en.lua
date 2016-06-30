@@ -34,6 +34,15 @@ end;
 global {
     -- 0 = not holding breath
     gl_holdbreathtimer = 0, 
+
+    -- result will be 8..128 in steps of 8
+    gl_encrypted_x = rnd(16) * 8,
+    gl_encrypted_y = rnd(16) * 8,
+
+    gl_destination_x = rnd(16) * 8,
+    gl_destination_y = rnd(16) * 8,
+
+    gl_activated_arming = false,
 }
 
 -- ROOMS
@@ -106,6 +115,11 @@ captains_quarters = room {
     },
 }:disable();
 
+closed_eyes = room {
+    nam = '',
+    dsc = [[You can't see anything!]],
+};
+
 command_station = room {
     nam = 'Command station',
     obj = {
@@ -119,10 +133,11 @@ command_station = room {
     },
 }
 
-closed_eyes = room {
-    nam = '',
-    dsc = [[You can't see anything!]],
-};
+congratulations = room {
+    nam = 'Congratulations',
+    hideinv = true,
+    dsc = "mission accomplished",
+}
 
 crews_quarters = room {
     nam = "Crew's quarters",
@@ -240,7 +255,9 @@ forward_passage = room {
                 end
             end,
             used = function(s, w)
-                if w == pistol then
+                if w == key then
+                    p "Key won't fit"
+                elseif w == pistol then
                     captains_quarters:enable()
                     p "Lock destroyed!"
                 end
@@ -312,8 +329,24 @@ lower_missile_bay = room {
     obj = {
         obj {
             nam = "arming switch",
-            dsc = "locked arming {switch}",
+            dsc = function (s)
+                if gl_activated_arming then
+                    p "Activated arming {switch}."
+                else
+                    p "locked arming {switch}."
+                end
+            end,
             act = "lock is very secure",
+            used = function(s, w)
+                if w == key then
+                    gl_activated_arming = not gl_activated_arming
+                    if gl_activated_arming then
+                        p "You activated the arming lock."
+                    else
+                        p "You deactivated the arming lock."
+                    end
+                end
+            end,
         },
     },
     way = {
@@ -336,22 +369,37 @@ missile_control = room {
     obj = {
         obj {
             nam = 'airlock',
-            dsc = "There is an {airlock}",
-            act = '',
-        },
-        obj {
-            nam = 'airlockslot',
-            dsc = "with a {slot}",
+            dsc = function(s)
+                if lower_missile_bay:disabled() then
+                    p "There is a closed airlock with a {slot} next to it."
+                else
+                    p "There is a open airlock with a {slot} next to it."
+                end
+            end,
             act = "It accepts a security ID card.",
             used = function(s, w)
                 if w == card then
                     p "Did you look at the card?"
+                elseif w == security_id then
+                    lower_missile_bay:enable()
+                    remove(w, me())
+                    p "The airlock is opened"
                 end
             end,
         },
         obj {
             nam = 'white button',
             dsc = "There is a {white button}",
+            act = function(s)
+                if gl_activated_arming 
+                        and gl_encrypted_x == gl_destination_x 
+                        and gl_encrypted_y == gl_destination_y then
+                    walkin('congratulations')
+                    p "You have finished this game"
+                else
+                    p "Nothing happens."
+                end
+            end,
         },
     },
     way = {
@@ -369,6 +417,9 @@ navigation_center = room {
         obj{
             nam = "Digital display",
             dsc = "Digital {display}",
+            act = function(s)
+                p('X='..tostring(gl_encrypted_x)..' Y='..tostring(gl_encrypted_y))
+            end,
         },
         obj{
             nam = "Tactics manual",
@@ -462,14 +513,31 @@ upper_missile_bay = room {
         obj {
             nam = "Digital display",
             dsc = "Digital {display}",
+            act = function(s)
+                p('X='..tostring(gl_destination_x)..' Y='..tostring(gl_destination_y))
+            end,
         },
         obj {
             nam = "Gold Button",
             dsc = "Gold {Button}",
+            act = function(s)
+                gl_destination_x = gl_destination_x + 8
+                if gl_destination_x > 128 then
+                    gl_destination_x = 0
+                end
+                p('X='..tostring(gl_destination_x)..' Y='..tostring(gl_destination_y))
+            end,
         },
         obj {
             nam = "Silver button",
             dsc = "Silver {button}",
+            act = function(s)
+                gl_destination_y = gl_destination_y - 8
+                if gl_destination_y < 0 then
+                    gl_destination_y = 128
+                end
+                p('X='..tostring(gl_destination_x)..' Y='..tostring(gl_destination_y))
+            end,
         },
     },
     way = {
@@ -621,9 +689,11 @@ grate = obj {
 }
 
 key = obj {
-    nam = 'key',
+    nam = 'Key',
     dsc = "a {key}",
-}
+    tak = "you take the key",
+    inv = "Key",
+}:disable();
 
 knife = obj {
     nam = 'knife',
@@ -779,8 +849,14 @@ radiation_suit = obj {
     dsc = 'There is a {radiation suit}',
     tak = 'You wear the radiation suit',
     inv = function (s)
-        drop(s) -- todo different action ;)
-        p 'You drop the radiation suit'
+        if key:disabled() then
+            key:enable()
+            place(key)
+            p "You found a key"
+        else
+            drop(s)
+            p 'You drop the radiation suit'
+        end
     end,
 }
 
