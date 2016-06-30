@@ -162,19 +162,44 @@ escape_tube = room {
 
 fan_room = room {
     nam = 'Fan room',
+    var {
+        -- this gives time for one action.
+        -- if you enter the room and leave immediately, you stay alive
+        -- if you look at the traitor you see the result,
+        -- but you will be shot if you try to leave
+        countdown = 3,
+    },
     obj = {
-        obj {
-            nam = 'traitor',
-            dsc = "The {traitor} stands here",
-        },
-        obj {
-            nam = 'pistol',
-            dsc = 'he holds a {pistol}.',
-        },
+        'traitor',
     },
     way = {
         'missile_control', -- E
     },
+    entered = function(s)
+        if traitor.alive then
+            if (have(sonarunit)) then
+                -- walking with the radioactive unit to the room where the
+                -- traitor is, would be an attack so he kills you instantly.
+                -- find a different way
+                -- this limitation is not in the original game, but the
+                -- sonarunit would also not kill the traitor
+                s.countdown = 0
+            end
+            lifeon(s);
+        end
+    end,
+    life = function(s)
+        if s.countdown > 0 then
+            s.countdown = s.countdown - 1
+        end
+        if s.countdown == 0 then
+            walkin('dead')
+            p "The traitor shoots you and kills you instantly!"
+        end
+        if here() ~= fan_room then
+            lifeoff(s);
+        end
+    end,
 }
 
 forward_passage = room {
@@ -393,6 +418,8 @@ ventilation_duct = room {
             used = function(s,w)
                 if w == sonarunit then
                     drop(w, fan_room)
+                    traitor.alive = false
+                    place(pistol, fan_room)
                     p 'It falls down to the fan room.'
                 end
             end,
@@ -585,6 +612,32 @@ periscope = obj {
     end,
 }
 
+pistol = obj {
+    nam = 'pistol',
+    var {
+        bullet = true;
+    },
+    dsc = 'There is a {pistol} lying on the floor.',
+    tak = "I take the pistol",
+    inv = function(s)
+        if s.bullet then
+            p "It has only one bullet"
+        else
+            p "It does not have any bullets"
+        end
+    end,
+    use = function(s, w)
+        if not s.bullet then
+            p "The pistol does not have any bullets left."
+        elseif w == traitor then
+            return false -- todo
+        else
+            s.bullet = false
+            p 'PENG!';
+        end
+    end,
+}
+
 poison = obj {
     nam = 'Poison',
     life = function(s)
@@ -598,7 +651,7 @@ poison = obj {
 }
 
 sonarunit = obj {
-    nam = 'sonarunit',
+    nam = 'Radioactive sonar unit',
     var {
         rusty = true,
         bolted = true,
@@ -606,9 +659,9 @@ sonarunit = obj {
     },
     dsc =  function(s)
         if s.rusty then
-            p 'a bolted-down radioactive {sonar unit}'
+            p 'a bolted-down radioactive {sonar unit}.'
         else
-            p 'a radioactive glowing {sonar unit}'
+            p 'a radioactive glowing {sonar unit}.'
         end
     end,
     act =  function(s)
@@ -630,7 +683,8 @@ sonarunit = obj {
     used = function(s, w)
         if w == shampoo then
             s.rusty = false
-            p "the bolts are shiny now."
+            remove(w, me())
+            p "shampoo all used up."
         end
         if w == wrench then
             if s.rusty then
@@ -646,7 +700,8 @@ sonarunit = obj {
 radiation = obj {
     nam = 'Radiation',
     life = function(s)
-        if here() == sonar_sphere and not have(radiation_suit) then
+        if (here() == where(sonarunit) or have(sonarunit)) and not have(radiation_suit) then
+            -- note in the original game you get killed in the sonar sphere only
             walkin('dead')
             p "A blast of radioactivity kills you instantly!"
         end
@@ -691,6 +746,27 @@ shampoo = obj {
     dsc = 'There is a bottle of {shampoo}',
     tak = 'You take the bottle',
     inv = 'Looks like normal shampoo',
+}
+
+traitor = obj {
+    nam = 'traitor',
+    var {
+        alive = true,
+    },
+    dsc = function(s)
+        if s.alive then
+            p "The {traitor} holding a pistol stands here."
+        else
+            p "The {traitor} is lying dead on the floor."
+        end
+    end,
+    act =  function(s)
+        if s.alive then
+            p "He looks dangerous"
+        else
+            p "He is dead"
+        end
+    end,
 }
 
 wrench = obj {
