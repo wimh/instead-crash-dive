@@ -55,6 +55,13 @@ about = room {
 
 access_tunnel = room {
     nam = 'Access tunnel',
+    obj = {
+        obj {
+            nam = 'sign',
+            dsc = 'There is a {sign}.',
+            act = 'DANGER: Radiation zone!',
+        },
+    },
     way = {
         'sonar_sphere', -- N
         'forward_passage', -- S
@@ -74,10 +81,12 @@ ballast_control = room {
 
 captains_quarters = room {
     nam = "Captain's quarters",
+    obj = {
+    },
     way = {
         'forward_passage', -- E
     },
-}
+}:disable();
 
 command_station = room {
     nam = 'Command station',
@@ -100,6 +109,9 @@ closed_eyes = room {
 crews_quarters = room {
     nam = "Crew's quarters",
     dsc = [[crews_quarters]],
+    obj = {
+        'card',
+    },
     way = {
         vroom('Up', 'forward_passage'),
         'torpedo_room', -- N
@@ -149,6 +161,16 @@ escape_tube = room {
 
 fan_room = room {
     nam = 'Fan room',
+    obj = {
+        obj {
+            nam = 'traitor',
+            dsc = "The {traitor} stands here",
+        },
+        obj {
+            nam = 'pistol',
+            dsc = 'he holds a {pistol}.',
+        },
+    },
     way = {
         'missile_control', -- E
     },
@@ -157,6 +179,13 @@ fan_room = room {
 forward_passage = room {
     nam = 'Forward passage',
     dsc = [[forward_passage]],
+    obj = {
+        obj {
+            nam = 'door',
+            dsc = 'There is closed {door}',
+            act = 'The lock is very secure, you cannot open it.',
+        },
+    },
     way = {
         vroom('Up', 'escape_tube'),
         vroom('Down', 'crews_quarters'),
@@ -168,6 +197,14 @@ forward_passage = room {
 
 galley = room {
     nam = 'Galley',
+    obj = {
+        obj {
+            nam = 'knife',
+            dsc = 'there is a dull {knife}',
+            tak = 'You take the knife.',
+            inv = 'Dull knife',
+        }
+    },
     way = {
         'crews_quarters', -- W
     },
@@ -216,11 +253,13 @@ long_corridor = room {
 
 lower_missile_bay = room {
     nam = 'Lower missile bay',
+    obj = {
+    },
     way = {
         'missile_control', -- N
         vroom('Up', 'upper_missile_bay'),
     },
-}
+}:disable();
 
 main = room {
     nam = 'Crash Dive!',
@@ -234,6 +273,25 @@ main = room {
 missile_control = room {
     nam = "Missile control",
     obj = {
+        obj {
+            nam = 'airlock',
+            dsc = "There is an {airlock}",
+            act = '',
+        },
+        obj {
+            nam = 'airlockslot',
+            dsc = "with a {slot}",
+            act = "It accepts a security ID card.",
+            used = function(s, w)
+                if w == card then
+                    p "Did you look at the card?"
+                end
+            end,
+        },
+        obj {
+            nam = 'white button',
+            dsc = "There is a {white button}",
+        },
     },
     way = {
         vroom('Up', 'command_station'),
@@ -246,6 +304,8 @@ missile_control = room {
 
 navigation_center = room {
     nam = 'Navigation center',
+    obj = {
+    },
     way = {
         'command_station', -- W
     },
@@ -253,6 +313,9 @@ navigation_center = room {
 
 radio_room = room {
     nam = 'Radio room',
+    obj = {
+        'cable_cutters',
+    },
     way = {
         'long_corridor', -- E
     },
@@ -272,6 +335,17 @@ shower_stalls = room {
 
 sonar_sphere = room {
     nam = 'Sonar sphere',
+    obj = {
+        obj {
+            nam = 'sonarunit',
+            dsc = 'a bolted-down {sonar unit}',
+            act = 'The bolts are tight and rusty.'
+        },
+        obj {
+            nam = 'cable',
+            dsc = 'a {power cable}',
+        },
+    },
     way = {
         'access_tunnel', -- S
     },
@@ -279,6 +353,8 @@ sonar_sphere = room {
 
 sonar_station = room {
     nam = 'Sonar station',
+    obj = {
+    },
     way = {
         'long_corridor', -- W
     },
@@ -286,6 +362,8 @@ sonar_station = room {
 
 torpedo_room = room {
     nam = 'Torpedo room',
+    obj = {
+    },
     way = {
         'crews_quarters', -- S
         'weapons_locker', -- E
@@ -294,6 +372,8 @@ torpedo_room = room {
 
 upper_missile_bay = room {
     nam = 'Upper missile bay',
+    obj = {
+    },
     way = {
         vroom('Down', 'lower_missile_bay'),
     },
@@ -301,6 +381,13 @@ upper_missile_bay = room {
 
 ventilation_duct = room {
     nam = 'Ventilation duct',
+    obj = {
+        obj {
+            nam = 'duct',
+            dsc = 'There is a {duct} down to the fan room.',
+            act = '',
+        }
+    },
     way = {
         'shower_stalls', -- N
     },
@@ -318,11 +405,22 @@ weapons_locker = room {
 
 -- OBJECTS
 
+cable_cutters = obj {
+    nam = 'Cable cutters',
+}
+
+card = obj {
+    nam = 'card',
+    dsc = "there is a {card}",
+    tak = 'you take the card.',
+    inv = "it's the Ace of Spades!",
+}
+
 depth_gauge = obj {
+    nam = 'Depth gauge',
     var {
         depth = 0,
     },
-    nam = 'Depth gauge',
     dsc = 'There is a {depth gauge} at the wall',
     act = function(s)
         p(tostring(s.depth)..' fathoms') 
@@ -344,10 +442,10 @@ ears = obj {
 };
 
 enemy = obj {
+    nam = 'Enemy',
     var {
         timer = 30,
     },
-    nam = 'Enemy',
     life = function(s)
         if s.timer > 0 then
             s.timer = s.timer - 1
@@ -406,6 +504,11 @@ grate = obj {
             p "You can't unscrew it, the screwdriver is too tiny."
         end
     end,
+}
+
+key = obj {
+    nam = 'key',
+    dsc = "a {key}",
 }
 
 mouth = obj {
