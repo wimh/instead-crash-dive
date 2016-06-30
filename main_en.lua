@@ -83,6 +83,23 @@ ballast_control = room {
 captains_quarters = room {
     nam = "Captain's quarters",
     obj = {
+        obj {
+            nam = "Dead captain",
+            dsc = "The {captain} lays here, he is dead.",
+            act =  function(s)
+                if security_id:disabled() then
+                    security_id:enable()
+                    p "You found something."
+                else
+                    p "He is dead..."
+                end
+            end,
+        },
+        obj {
+            nam = "Suicide note",
+            dsc = "a suicide {note}",
+        },
+        'security_id',
     },
     way = {
         'forward_passage', -- E
@@ -208,8 +225,26 @@ forward_passage = room {
     obj = {
         obj {
             nam = 'door',
-            dsc = 'There is closed {door}',
-            act = 'The lock is very secure, you cannot open it.',
+            dsc = function(s)
+                if captains_quarters:disabled() then
+                    p 'There is a closed {door}'
+                else
+                    p 'There is an open {door}'
+                end
+            end,
+            act = function(s)
+                if captains_quarters:disabled() then
+                    p 'The lock is very secure, you cannot open it.'
+                else
+                    p 'There lock is broken'
+                end
+            end,
+            used = function(s, w)
+                if w == pistol then
+                    captains_quarters:enable()
+                    p "Lock destroyed!"
+                end
+            end,
         },
     },
     way = {
@@ -275,6 +310,11 @@ long_corridor = room {
 lower_missile_bay = room {
     nam = 'Lower missile bay',
     obj = {
+        obj {
+            nam = "arming switch",
+            dsc = "locked arming {switch}",
+            act = "lock is very secure",
+        },
     },
     way = {
         'missile_control', -- N
@@ -326,6 +366,14 @@ missile_control = room {
 navigation_center = room {
     nam = 'Navigation center',
     obj = {
+        obj{
+            nam = "Digital display",
+            dsc = "Digital {display}",
+        },
+        obj{
+            nam = "Tactics manual",
+            dsc = "Tactics {manual}",
+        },
     },
     way = {
         'command_station', -- W
@@ -383,6 +431,14 @@ sonar_sphere = room {
 sonar_station = room {
     nam = 'Sonar station',
     obj = {
+        obj{
+            nam = "Blank scanner",
+            dsc = "Blank {scanner}",
+        },
+        obj{
+            nam = "Green button",
+            dsc = "Green {button}",
+        },
     },
     way = {
         'long_corridor', -- W
@@ -403,6 +459,18 @@ torpedo_room = room {
 upper_missile_bay = room {
     nam = 'Upper missile bay',
     obj = {
+        obj {
+            nam = "Digital display",
+            dsc = "Digital {display}",
+        },
+        obj {
+            nam = "Gold Button",
+            dsc = "Gold {Button}",
+        },
+        obj {
+            nam = "Silver button",
+            dsc = "Silver {button}",
+        },
     },
     way = {
         vroom('Down', 'lower_missile_bay'),
@@ -629,11 +697,9 @@ pistol = obj {
     use = function(s, w)
         if not s.bullet then
             p "The pistol does not have any bullets left."
-        elseif w == traitor then
-            return false -- todo
         else
             s.bullet = false
-            p 'PENG!';
+            p 'BANG!';
         end
     end,
 }
@@ -733,6 +799,12 @@ red_button = obj {
         end
     ]],
 }
+
+security_id = obj {
+    nam = "Security ID",
+    dsc = "You found a {Security ID}",
+    tak = "You take the Secutity ID.",
+}:disable();
 
 screwdriver = obj {
     nam = 'Tiny screwdriver',
