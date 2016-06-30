@@ -28,6 +28,7 @@ function init()
     take(mouth); 
     take(feet);
     lifeon(enemy, 6);
+    lifeon(radiation, 4);
 end; 
 
 global {
@@ -336,14 +337,22 @@ shower_stalls = room {
 sonar_sphere = room {
     nam = 'Sonar sphere',
     obj = {
-        obj {
-            nam = 'sonarunit',
-            dsc = 'a bolted-down {sonar unit}',
-            act = 'The bolts are tight and rusty.'
-        },
+        'sonarunit',
         obj {
             nam = 'cable',
-            dsc = 'a {power cable}',
+            dsc = function(s)
+                if sonarunit.connected then
+                    p 'a {power cable}'
+                else
+                    p 'a severed {power cable}'
+                end
+            end,
+            used = function(s, w)
+                if w == cable_cutters then
+                    sonarunit.connected = false
+                    p "You have cut the power cable."
+                end
+            end,
         },
     },
     way = {
@@ -363,6 +372,7 @@ sonar_station = room {
 torpedo_room = room {
     nam = 'Torpedo room',
     obj = {
+        'wrench',
     },
     way = {
         'crews_quarters', -- S
@@ -571,6 +581,59 @@ poison = obj {
     end,
 }
 
+sonarunit = obj {
+    nam = 'sonarunit',
+    var {
+        rusty = true,
+        bolted = true,
+        connected = true,
+    },
+    dsc =  function(s)
+        if s.rusty then
+            p 'a bolted-down radioactive {sonar unit}'
+        else
+            p 'a radioactive {sonar unit}'
+        end
+    end,
+    act =  function(s)
+        if s.rusty then
+            p 'The bolts are tight and rusty.'
+        elseif s.bolted then
+            p "The bolts won't let you pick it up"
+        elseif s.connected then
+            p "It is connected to the cable"
+        else
+            take(s)
+            p "you picked up the radioactive sonar unit"
+        end
+    end,
+    inv = 'It glows...',
+    used = function(s, w)
+        if w == shampoo then
+            s.rusty = false
+            p "the bolts are shiny now."
+        end
+        if w == wrench then
+            if s.rusty then
+                p "the bolts are too tight and rusty"
+            else
+                s.bolted = false
+                p "you have removed the bolts"
+            end
+        end
+    end,
+}
+
+radiation = obj {
+    nam = 'Radiation',
+    life = function(s)
+        if here() == sonar_sphere and not have(radiation_suit) then
+            walkin('dead')
+            p "A blast of radioactivity kills you instantly!"
+        end
+    end,
+}
+
 radiation_suit = obj {
     nam = 'Radiation suit',
     dsc = 'There is a {radiation suit}',
@@ -611,3 +674,8 @@ shampoo = obj {
     inv = 'Looks like normal shampoo',
 }
 
+wrench = obj {
+    nam = 'Wrench',
+    dsc = 'a {wrench}',
+    tak = 'you take the wrench',
+}
