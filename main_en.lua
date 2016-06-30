@@ -5,17 +5,15 @@
 
 instead_version '1.9.1'
 
-require 'dbg'
+--require 'dbg'
 
-require 'object'
-require 'para'
 require 'xact'
-require 'dash'
-require "hideinv"
+require 'hideinv'
+require 'kbd'
 
-game.use = 'That’s not possible...';
-game.inv = 'A strange thing...'
-game.act = 'Nothing happens'
+game.use = "That’s not possible...";
+game.inv = "A strange thing..."
+game.act = "Nothing happens"
 
 game.codepage="UTF-8"
 
@@ -27,8 +25,9 @@ function init()
     take(nose);
     take(mouth); 
     take(feet);
-    lifeon(enemy, 6);
     lifeon(radiation, 4);
+
+    hook_keys('n','s', 'e', 'w', 'u', 'd'); -- North, South, East, West, Up, Down
 end; 
 
 global {
@@ -173,6 +172,9 @@ escape_tube = room {
     forcedsc = true,
     nam = 'Escape tube',
     dsc = [[You are in the escape tube. There is a {hatch|hatch} in the floor. It has a {hatch_handle|handle} to open it.]],
+    entered = function(s)
+        lifeon(enemy, 6);
+    end,
     obj = { 
         xact('hatch', 'It is airtight'),
         xact('hatch_handle', code[[
@@ -190,13 +192,17 @@ escape_tube = room {
     way = {
         vroom('Down', 'forward_passage'):disable(),
     },
+    kbd = function(s, down, key)
+        if down and key == 'd' and not disabled(path('Down')) then
+            walk('forward_passage');
+        end
+    end
 };
 
 fan_room = room {
     nam = 'Fan room',
     var {
         -- this gives time for one action.
-        -- if you enter the room and leave immediately, you stay alive
         -- if you look at the traitor you see the result,
         -- but you will be shot if you try to leave
         countdown = 3,
@@ -220,6 +226,12 @@ fan_room = room {
             lifeon(s);
         end
     end,
+    left = function(s)
+        -- if the traitor has seen you, he will kill you if you try to run
+        if traitor.alive then
+            s.countdown = 0
+        end
+    end,
     life = function(s)
         if s.countdown > 0 then
             s.countdown = s.countdown - 1
@@ -227,9 +239,6 @@ fan_room = room {
         if s.countdown == 0 then
             walkin('dead')
             p "The traitor shoots you and kills you instantly!"
-        end
-        if here() ~= fan_room then
-            lifeoff(s);
         end
     end,
 }
@@ -391,8 +400,8 @@ missile_control = room {
             nam = 'white button',
             dsc = "There is a {white button}",
             act = function(s)
-                if gl_activated_arming 
-                        and gl_encrypted_x == gl_destination_x 
+                if gl_activated_arming
+                        and gl_encrypted_x == gl_destination_x
                         and gl_encrypted_y == gl_destination_y then
                     walkin('congratulations')
                     p "You have finished this game"
@@ -623,7 +632,7 @@ enemy = obj {
         if s.timer > 0 then
             s.timer = s.timer - 1
         end
-        -- p(tostring(s.timer))
+        --p(tostring(s.timer))
         -- p(tostring(depth_gauge.depth))
         if s.timer == 0 and depth_gauge.depth == 0 then
             if here() ~= dead then
