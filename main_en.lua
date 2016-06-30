@@ -199,12 +199,7 @@ forward_passage = room {
 galley = room {
     nam = 'Galley',
     obj = {
-        obj {
-            nam = 'knife',
-            dsc = 'there is a dull {knife}',
-            tak = 'You take the knife.',
-            inv = 'Dull knife',
-        }
+        'knife',
     },
     way = {
         'crews_quarters', -- W
@@ -330,7 +325,7 @@ shower_stalls = room {
     },
     way = {
         'crews_quarters', -- E
-         vroom('Ventilation shaft', 'ventilation_duct'):disable(), -- N
+         'ventilation_duct', -- N
     },
 }
 
@@ -395,13 +390,18 @@ ventilation_duct = room {
         obj {
             nam = 'duct',
             dsc = 'There is a {duct} down to the fan room.',
-            act = '',
+            used = function(s,w)
+                if w == sonarunit then
+                    drop(w, fan_room)
+                    p 'It falls down to the fan room.'
+                end
+            end,
         }
     },
     way = {
         'shower_stalls', -- N
     },
-}
+}:disable();
 
 weapons_locker = room {
     nam = 'Weapons locker',
@@ -508,10 +508,19 @@ gas_mask = obj {
 grate = obj {
     nam = 'Grate',
     dsc = 'there is a {grate} on the wall towards the stern of the sub',
-    act = 'it is screwed in place',
+    act = function(s)
+        if ventilation_duct:disabled() then
+            p 'it is screwed in place'
+        else
+            p 'it is open'
+        end
+    end,
     used = function(s, w)
         if w == screwdriver then
             p "You can't unscrew it, the screwdriver is too tiny."
+        elseif w == knife then
+            ventilation_duct:enable()
+            p "You have unscrewed the grate."
         end
     end,
 }
@@ -519,6 +528,13 @@ grate = obj {
 key = obj {
     nam = 'key',
     dsc = "a {key}",
+}
+
+knife = obj {
+    nam = 'knife',
+    dsc = 'there is a dull {knife}',
+    tak = 'You take the knife.',
+    inv = 'Dull knife',
 }
 
 mouth = obj {
@@ -592,7 +608,7 @@ sonarunit = obj {
         if s.rusty then
             p 'a bolted-down radioactive {sonar unit}'
         else
-            p 'a radioactive {sonar unit}'
+            p 'a radioactive glowing {sonar unit}'
         end
     end,
     act =  function(s)
@@ -607,7 +623,10 @@ sonarunit = obj {
             p "you picked up the radioactive sonar unit"
         end
     end,
-    inv = 'It glows...',
+    inv = function (s)
+        drop(s)
+        p 'You have dropped the sonar unit.'
+    end,
     used = function(s, w)
         if w == shampoo then
             s.rusty = false
