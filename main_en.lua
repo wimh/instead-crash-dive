@@ -19,6 +19,7 @@ game.act = 'Nothing happens'
 
 game.codepage="UTF-8"
 
+-- FUNCTIONS + GLOBALS
 
 function init()
     take(eyes); 
@@ -34,6 +35,7 @@ global {
     gl_holdbreathtimer = 0, 
 }
 
+-- ROOMS
 
 about = room {
     nam = 'About original game',
@@ -95,51 +97,6 @@ dead = room {
     hideinv = true,
 }
 
-depth_gauge = obj {
-    var {
-        depth = 0,
-    },
-    nam = 'Depth gauge',
-    dsc = 'There is a {depth gauge} at the wall',
-    act = function(s)
-        p(tostring(s.depth)..' fathoms') 
-    end,
-    life = function(s)
-        if s.depth < 128 then
-            s.depth = s.depth + 8
-            if s.depth == 128 then
-                lifeoff(s)
-                p(txtb('BANG!')..' sub hits bottom')
-            end
-        end
-    end,
-}
-
-ears = obj {
-    nam = '(My Ears)',
-    inv = [[You listen. Everything is silent as death.]],
-};
-
-enemy = obj {
-    var {
-        timer = 30,
-    },
-    nam = 'Enemy',
-    life = function(s)
-        if s.timer > 0 then
-            s.timer = s.timer - 1
-        end
-        -- p(tostring(s.timer))
-        -- p(tostring(depth_gauge.depth))
-        if s.timer == 0 and depth_gauge.depth == 0 then
-            if here() ~= dead then
-                walkin('dead')
-                p "The enemy captures the sub and kills you instantly!"
-            end
-        end
-    end,
-}
-
 equipment_bay = room {
     nam = 'Equipment bay',
     obj = {
@@ -173,24 +130,6 @@ escape_tube = room {
     },
 };
 
-eyes = obj {
-    nam = '(My Eyes)',
-    inv = function(s)
-        if here() == closed_eyes then
-            walkout() 
-            p [[You opened your eyes. It's good to be able to see everything again.]]
-        else
-            walkin(closed_eyes) 
-            p [[You closed your eyes.]]
-        end
-    end,
-};
-
-feet = obj {
-    nam = '(My Feet)',
-    inv = 'You jump a few times. Nothing happens...',
-};
-
 forward_passage = room {
     nam = 'Forward passage',
     dsc = [[forward_passage]],
@@ -199,33 +138,6 @@ forward_passage = room {
         vroom('Down', 'crews_quarters'),
         'long_corridor', -- S
     },
-}
-
-gas_mask = obj {
-    nam = 'Gas mask',
-    dsc = code[[
-        if here() == weapons_locker then
-            p 'There is a {Gas mask} in an open locker.'
-        else
-            p 'There is a {Gas mask} on the floor.'
-        end
-    ]],
-    tak = 'You wear the Gas mask',
-    inv = function (s)
-        drop(s)
-        p 'You drop the Gas mask'
-    end,
-}
-
-grate = obj {
-    nam = 'Grate',
-    dsc = 'there is a {grate} on the astern wall',
-    act = 'it is screwed in place',
-    used = function(s, w)
-        if w == screwdriver then
-            p "You can't unscrew it, the screwdriver is too tiny."
-        end
-    end,
 }
 
 intro = room {
@@ -285,6 +197,127 @@ missile_control = room {
         'crews_quarters', -- N
         'equipment_bay', -- E
     },
+}
+
+shower_stalls = room {
+    nam = 'Shower stalls',
+    obj = {
+        'grate',
+        'shampoo',
+    },
+    way = {
+        'crews_quarters', -- E
+    },
+}
+
+torpedo_room = room {
+    nam = 'Torpedo room',
+    way = {
+        'crews_quarters', -- S
+        'weapons_locker', -- E
+    },
+}
+
+weapons_locker = room {
+    nam = 'Weapons locker',
+    obj = {
+        'gas_mask',
+    },
+    way = {
+        'torpedo_room', -- W
+    },
+}
+
+-- OBJECTS
+
+depth_gauge = obj {
+    var {
+        depth = 0,
+    },
+    nam = 'Depth gauge',
+    dsc = 'There is a {depth gauge} at the wall',
+    act = function(s)
+        p(tostring(s.depth)..' fathoms') 
+    end,
+    life = function(s)
+        if s.depth < 128 then
+            s.depth = s.depth + 8
+            if s.depth == 128 then
+                lifeoff(s)
+                p(txtb('BANG!')..' sub hits bottom')
+            end
+        end
+    end,
+}
+
+ears = obj {
+    nam = '(My Ears)',
+    inv = [[You listen. Everything is silent as death.]],
+};
+
+enemy = obj {
+    var {
+        timer = 30,
+    },
+    nam = 'Enemy',
+    life = function(s)
+        if s.timer > 0 then
+            s.timer = s.timer - 1
+        end
+        -- p(tostring(s.timer))
+        -- p(tostring(depth_gauge.depth))
+        if s.timer == 0 and depth_gauge.depth == 0 then
+            if here() ~= dead then
+                walkin('dead')
+                p "The enemy captures the sub and kills you instantly!"
+            end
+        end
+    end,
+}
+
+eyes = obj {
+    nam = '(My Eyes)',
+    inv = function(s)
+        if here() == closed_eyes then
+            walkout() 
+            p [[You opened your eyes. It's good to be able to see everything again.]]
+        else
+            walkin(closed_eyes) 
+            p [[You closed your eyes.]]
+        end
+    end,
+};
+
+feet = obj {
+    nam = '(My Feet)',
+    inv = 'You jump a few times. Nothing happens...',
+};
+
+gas_mask = obj {
+    nam = 'Gas mask',
+    dsc = code[[
+        if here() == weapons_locker then
+            p 'There is a {Gas mask} in an open locker.'
+        else
+            p 'There is a {Gas mask} on the floor.'
+        end
+    ]],
+    tak = 'You wear the Gas mask',
+    inv = function (s)
+        drop(s)
+        p 'You drop the Gas mask'
+    end,
+}
+
+grate = obj {
+    nam = 'Grate',
+    dsc = 'there is a {grate} on the astern wall',
+    act = 'it is screwed in place',
+    used = function(s, w)
+        if w == screwdriver then
+            p "You can't unscrew it, the screwdriver is too tiny."
+        end
+    end,
 }
 
 mouth = obj {
@@ -385,34 +418,5 @@ shampoo = obj {
     dsc = 'There is a bottle of {shampoo}',
     tak = 'You take the bottle',
     inv = 'Looks like normal shampoo',
-}
-
-shower_stalls = room {
-    nam = 'Shower stalls',
-    obj = {
-        'grate',
-        'shampoo',
-    },
-    way = {
-        'crews_quarters', -- E
-    },
-}
-
-torpedo_room = room {
-    nam = 'Torpedo room',
-    way = {
-        'crews_quarters', -- S
-        'weapons_locker', -- E
-    },
-}
-
-weapons_locker = room {
-    nam = 'Weapons locker',
-    obj = {
-        'gas_mask',
-    },
-    way = {
-        'torpedo_room', -- W
-    },
 }
 
