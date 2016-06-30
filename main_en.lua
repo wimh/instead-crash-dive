@@ -53,6 +53,14 @@ about = room {
     hideinv = true,
 };
 
+access_tunnel = room {
+    nam = 'Access tunnel',
+    way = {
+        'sonar_sphere', -- N
+        'forward_passage', -- S
+    },
+}
+
 ballast_control = room {
     nam = "Ballast control",
     obj = {
@@ -64,6 +72,13 @@ ballast_control = room {
     }
 }
 
+captains_quarters = room {
+    nam = "Captain's quarters",
+    way = {
+        'forward_passage', -- E
+    },
+}
+
 command_station = room {
     nam = 'Command station',
     obj = {
@@ -72,6 +87,7 @@ command_station = room {
     way = {
         vroom('Down', 'missile_control'),--command_station
         'long_corridor', -- N
+        'navigation_center', -- E
         'ballast_control', -- W
     },
 }
@@ -82,11 +98,12 @@ closed_eyes = room {
 };
 
 crews_quarters = room {
-    nam = 'Crews quarters',
+    nam = "Crew's quarters",
     dsc = [[crews_quarters]],
     way = {
         vroom('Up', 'forward_passage'),
         'torpedo_room', -- N
+        'galley', -- E
         'missile_control', -- S
         'shower_stalls', -- W
     },
@@ -130,13 +147,29 @@ escape_tube = room {
     },
 };
 
+fan_room = room {
+    nam = 'Fan room',
+    way = {
+        'missile_control', -- E
+    },
+}
+
 forward_passage = room {
     nam = 'Forward passage',
     dsc = [[forward_passage]],
     way = {
         vroom('Up', 'escape_tube'),
         vroom('Down', 'crews_quarters'),
+        'access_tunnel', -- N
         'long_corridor', -- S
+        'captains_quarters', -- W
+    },
+}
+
+galley = room {
+    nam = 'Galley',
+    way = {
+        'crews_quarters', -- W
     },
 }
 
@@ -175,7 +208,17 @@ long_corridor = room {
     },
     way = {
         'forward_passage', -- N
+        'sonar_station', -- E
         'command_station', -- S
+        'radio_room', -- W
+    },
+}
+
+lower_missile_bay = room {
+    nam = 'Lower missile bay',
+    way = {
+        'missile_control', -- N
+        vroom('Up', 'upper_missile_bay'),
     },
 }
 
@@ -196,6 +239,22 @@ missile_control = room {
         vroom('Up', 'command_station'),
         'crews_quarters', -- N
         'equipment_bay', -- E
+        'lower_missile_bay', -- S
+        'fan_room', -- W
+    },
+}
+
+navigation_center = room {
+    nam = 'Navigation center',
+    way = {
+        'command_station', -- W
+    },
+}
+
+radio_room = room {
+    nam = 'Radio room',
+    way = {
+        'long_corridor', -- E
     },
 }
 
@@ -207,6 +266,21 @@ shower_stalls = room {
     },
     way = {
         'crews_quarters', -- E
+         vroom('Ventilation shaft', 'ventilation_duct'):disable(), -- N
+    },
+}
+
+sonar_sphere = room {
+    nam = 'Sonar sphere',
+    way = {
+        'access_tunnel', -- S
+    },
+}
+
+sonar_station = room {
+    nam = 'Sonar station',
+    way = {
+        'long_corridor', -- W
     },
 }
 
@@ -215,6 +289,20 @@ torpedo_room = room {
     way = {
         'crews_quarters', -- S
         'weapons_locker', -- E
+    },
+}
+
+upper_missile_bay = room {
+    nam = 'Upper missile bay',
+    way = {
+        vroom('Down', 'lower_missile_bay'),
+    },
+}
+
+ventilation_duct = room {
+    nam = 'Ventilation duct',
+    way = {
+        'shower_stalls', -- N
     },
 }
 
@@ -311,7 +399,7 @@ gas_mask = obj {
 
 grate = obj {
     nam = 'Grate',
-    dsc = 'there is a {grate} on the astern wall',
+    dsc = 'there is a {grate} on the wall towards the stern of the sub',
     act = 'it is screwed in place',
     used = function(s, w)
         if w == screwdriver then
