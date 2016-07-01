@@ -46,9 +46,11 @@ about = room {
             That required some changes from the original game.
             Additional objects were added to allow multiple interactions on a single object. 
             The original game uses North, South, West and East for movement. 
-            They have been replaced by Afore, Astern, Aport and Astarboard to make them unambiguous. 
+            Now the room names are used, but the original keys still work if a keyboard is connected. 
           ]],
-    obj = { vway("1", "{Back to main menu}", 'main') },
+    kway = {
+        kroom(vroom('Back to main menu', 'main'), 'd'),
+    },
     hideinv = true,
 };
 
@@ -126,6 +128,15 @@ congratulations = room {
     nam = 'Congratulations',
     hideinv = true,
     dsc = "mission accomplished",
+}
+
+credits = room {
+    nam = 'Credits',
+    dsc = [[]],
+    kway = {
+        kroom(vroom('Back to main menu', 'main'), 'u'),
+    },
+    hideinv = true,
 }
 
 crews_quarters = room {
@@ -321,7 +332,9 @@ intro = room {
             trembling in the airtight escape tube, knowing that now it's just you and the Sea Moss against
             whoever shut off the alarm. ^^
           ]],
-    obj = { vway("1", "{Start}", 'escape_tube') },
+    kway = {
+        kroom(vroom('Start', 'escape_tube'), 'n'),
+    },
     hideinv = true,
 };
 
@@ -370,9 +383,20 @@ lower_missile_bay = room {
 
 main = room {
     nam = 'Crash Dive!',
-    obj = { 
-            vway('1', '{About original game}^^', 'about'),
-            vway('2', '{Start game}', 'intro')
+    kway = {
+        kroom(vroom('^Start game^', 'intro'), 'n'),
+        kroom(vroom('^About original game^', 'about'), 'd'),
+        kroom(vroom('^Credits^', 'credits'), 'u'),
+    },
+    obj = {
+        obj {
+            nam = "back",
+            dsc = txtc("{Back to language selection}"),
+            act = function(s)
+                gamefile('main.lua')
+                p ""
+            end,
+        }
     },
     hideinv = true,
 };

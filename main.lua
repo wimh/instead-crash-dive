@@ -1,12 +1,13 @@
 -- $Name:Crash Dive!$
--- $Version:0.1.0$
+-- $Version:0.2.0$
 
--- vim: set fileencoding=utf-8 nobomb
+-- vim: set fileencoding=utf-8 nobomb:
 
 instead_version '1.9.1'
 
 main = room {
     nam = 'Crash Dive!';
+    forcedsc = true,
     dsc = function(s)
         if     LANG == 'ru' then p [[Выберите язык игры:]];
         elseif LANG == 'uk' then p [[Мова:]];
@@ -20,13 +21,28 @@ main = room {
         else                     p [[Select game language:]];
         end
     end;
+    enter = function(s, f)
+        if f == s then
+            -- if user language matches game language, do not ask
+            if LANG == 'en' then
+                gamefile('main_en.lua', true)
+            end
+            --[[ debug only !!!
+            take(gas_mask, weapons_locker);
+            take(radiation_suit, equipment_bay);
+            take(shampoo, shower_stalls);
+            take(wrench, torpedo_room);
+            take(cable_cutters, radio_room);
+            take(sonarunit, sonar_sphere);
+            take(knife, galley);
+            take(pistol);
+            walk(crews_quarters);
+            --]]
+        end
+    end;
     obj = {
         obj {
             nam = 'en'; dsc = '> {English}^'; act = code [[ gamefile('main_en.lua', true) ]];
-        };
-
-        obj {
-            nam = 'quickstart'; dsc = '^> {quickstart}^'; act = code [[ gamefile('main_en.lua', true); walk(escape_tube) ]];
         };
     }
 }
