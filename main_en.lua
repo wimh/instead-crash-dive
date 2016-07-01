@@ -836,6 +836,9 @@ sonarunit = obj {
 radiation = obj {
     nam = 'Radiation',
     life = function(s)
+        if where(sonarunit) == nil and not have(sonarunit) then
+            move('sonarunit', 'sonar_sphere', 'sonar_sphere'); -- fix where()
+        end
         if (here() == where(sonarunit) or have(sonarunit)) and not have(radiation_suit) then
             -- note in the original game you get killed in the sonar sphere only
             walkin('dead')
