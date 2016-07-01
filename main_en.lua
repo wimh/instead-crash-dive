@@ -7,7 +7,6 @@ instead_version '1.9.1'
 
 --require 'dbg'
 
-require 'xact'
 require 'hideinv'
 require 'kroom'
 
@@ -166,24 +165,32 @@ equipment_bay = room {
 }
 
 escape_tube = room {
-    forcedsc = true,
     nam = 'Escape tube',
-    dsc = [[You are in the escape tube. There is a {hatch|hatch} in the floor. It has a {hatch_handle|handle} to open it.]],
+    dsc = "You are in the escape tube.",
     entered = function(s)
         lifeon(enemy, 6);
     end,
     obj = { 
-        xact('hatch', 'It is airtight'),
-        xact('hatch_handle', code[[
-            if not forward_passage:disabled() then
-                p "You close the hatch."
-                forward_passage:disable()
-            else
-                p "You open the hatch."
-                forward_passage:enable()
-                lifeon(poison, 5)
-            end
-        ]]),
+        obj {
+            nam = "hatch",
+            dsc = "There is a {hatch} in the floor.",
+            act = 'It is airtight',
+        },
+        obj {
+            nam = "handle",
+            dsc = "It has a {handle} to open it.",
+            act = function(s) 
+                if not forward_passage:disabled() then
+                    p "You close the hatch."
+                    forward_passage:disable()
+                    -- closing it does not remove the gas already here ;)
+                else
+                    p "You open the hatch."
+                    forward_passage:enable()
+                    lifeon(poison, 5)
+                end
+            end,
+        },
         'screwdriver',
     },
     kway = {
