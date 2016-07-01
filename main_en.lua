@@ -19,18 +19,11 @@ game.codepage="UTF-8"
 -- FUNCTIONS + GLOBALS
 
 function init()
-    take(eyes); 
-    take(ears); 
-    take(nose);
-    take(mouth); 
-    take(feet);
     lifeon(radiation, 4);
+    lifeon(poison, 5)
 end; 
 
 global {
-    -- 0 = not holding breath
-    gl_holdbreathtimer = 0, 
-
     -- result will be 8..128 in steps of 8
     gl_encrypted_x = rnd(16) * 8,
     gl_encrypted_y = rnd(16) * 8,
@@ -187,8 +180,21 @@ escape_tube = room {
                 else
                     p "You open the hatch."
                     forward_passage:enable()
-                    lifeon(poison, 5)
+                    poison.escaped = true
                 end
+            end,
+        },
+        obj {
+            nam = "hero",
+            dsc = "In the shiny metal you see {yourself}.",
+            act = function(s) 
+              if poison.holdbreathtimer > 0 then
+                  poison.holdbreathtimer = 0
+                  p [[You start breathing again.]]
+              else
+                  poison.holdbreathtimer = 10
+                  p [[You hold your breath.]]
+              end
             end,
         },
         'screwdriver',
@@ -616,11 +622,6 @@ depth_gauge = obj {
     end,
 }
 
-ears = obj {
-    nam = '(My Ears)',
-    inv = [[You listen. Everything is silent as death.]],
-};
-
 enemy = obj {
     nam = 'Enemy',
     var {
@@ -640,24 +641,6 @@ enemy = obj {
         end
     end,
 }
-
-eyes = obj {
-    nam = '(My Eyes)',
-    inv = function(s)
-        if here() == closed_eyes then
-            walkout() 
-            p [[You opened your eyes. It's good to be able to see everything again.]]
-        else
-            walkin(closed_eyes) 
-            p [[You closed your eyes.]]
-        end
-    end,
-};
-
-feet = obj {
-    nam = '(My Feet)',
-    inv = 'You jump a few times. Nothing happens...',
-};
 
 gas_mask = obj {
     nam = 'Gas mask',
@@ -709,42 +692,6 @@ knife = obj {
     inv = 'Dull knife',
 }
 
-mouth = obj {
-    nam = '(My Mouth)',
-    inv = function(s)
-        if gl_holdbreathtimer > 0 then
-            lifeoff(s)
-            gl_holdbreathtimer = 0
-            p [[It feels so good to breath again]]
-        else
-            gl_holdbreathtimer = 10
-            lifeon(s, 3)
-            p [[You hold your breath]]
-        end
-    end,
-    life = function(s)
-        if gl_holdbreathtimer > 0 then
-            gl_holdbreathtimer = gl_holdbreathtimer - 1
-            -- p(tostring(gl_holdbreathtimer))
-            if gl_holdbreathtimer == 0 then
-                lifeoff(s)
-                p [[You are no longer able to hold your breath.]]
-            end
-        end
-    end,
-};
-
-nose = obj {
-    nam = '(My Nose)',
-    inv = function(s)
-        if have(gas_mask) then
-            p [[You can't smell anything because of the gas mask.]]
-        else
-            p [[There is a smell of oil on your hands.]]
-        end
-    end,
-};
-
 periscope = obj {
     nam = 'Periscope',
     dsc = 'there is a {periscope} coming out of the roof.',
@@ -783,8 +730,19 @@ pistol = obj {
 
 poison = obj {
     nam = 'Poison',
+    var{
+        escaped = false, -- escaped to escape tube
+        holdbreathtimer = 0, -- 0 = not holding breath
+    },
     life = function(s)
-        if gl_holdbreathtimer == 0 and not have(gas_mask) then
+        -- p(tostring(s.holdbreathtimer))
+        if s.holdbreathtimer > 0 then
+            s.holdbreathtimer = s.holdbreathtimer - 1
+            if s.holdbreathtimer == 0 then
+                p [[You are no longer able to hold your breath.^]]
+            end
+        end
+        if poison.escaped and s.holdbreathtimer == 0 and not have(gas_mask) then
             if here() ~= dead then
                 walkin('dead')
                 p "A cloud of poisonous gas kills you instantly!"
