@@ -1,5 +1,5 @@
 -- $Name:Crash Dive!$
--- $Version:0.1.0$
+-- $Version:0.2.0$
 
 -- vim: set fileencoding=utf-8 nobomb foldmethod=syntax nofoldenable foldnestmax=1:
 
@@ -9,7 +9,7 @@ instead_version '1.9.1'
 
 require 'xact'
 require 'hideinv'
-require 'kbd'
+require 'kroom'
 
 game.use = "That’s not possible...";
 game.inv = "A strange thing..."
@@ -26,8 +26,6 @@ function init()
     take(mouth); 
     take(feet);
     lifeon(radiation, 4);
-
-    hook_keys('n','s', 'e', 'w', 'u', 'd'); -- North, South, East, West, Up, Down
 end; 
 
 global {
@@ -71,9 +69,9 @@ access_tunnel = room {
             act = 'DANGER: Radiation zone!',
         },
     },
-    way = {
-        'sonar_sphere', -- N
-        'forward_passage', -- S
+    kway = {
+        kroom('sonar_sphere', 'n'),
+        kroom('forward_passage', 's'),
     },
 }
 
@@ -83,8 +81,8 @@ ballast_control = room {
         'depth_gauge',
         'red_button',
     },
-    way = {
-        'command_station', -- E
+    kway = {
+        kroom('command_station', 'e'),
     }
 }
 
@@ -109,8 +107,8 @@ captains_quarters = room {
         },
         'security_id',
     },
-    way = {
-        'forward_passage', -- E
+    kway = {
+        kroom('forward_passage', 'e'),
     },
 }:disable();
 
@@ -124,11 +122,11 @@ command_station = room {
     obj = {
         'periscope',
     },
-    way = {
-        vroom('Down', 'missile_control'),--command_station
-        'long_corridor', -- N
-        'navigation_center', -- E
-        'ballast_control', -- W
+    kway = {
+        kroom('missile_control', 'd'),
+        kroom('long_corridor', 'n'),
+        kroom('navigation_center', 'e'),
+        kroom('ballast_control', 'w'),
     },
 }
 
@@ -140,16 +138,15 @@ congratulations = room {
 
 crews_quarters = room {
     nam = "Crew's quarters",
-    dsc = [[crews_quarters]],
     obj = {
         'card',
     },
-    way = {
-        vroom('Up', 'forward_passage'),
-        'torpedo_room', -- N
-        'galley', -- E
-        'missile_control', -- S
-        'shower_stalls', -- W
+    kway = {
+        kroom('forward_passage', 'u'),
+        kroom('torpedo_room', 'n'),
+        kroom('galley', 'e'),
+        kroom('missile_control', 's'),
+        kroom('shower_stalls', 'w'),
     },
 }
 
@@ -163,8 +160,8 @@ equipment_bay = room {
     obj = {
         'radiation_suit',
     },
-    way = {
-        'missile_control', -- W
+    kway = {
+        kroom('missile_control', 'w'),
     },
 }
 
@@ -178,25 +175,20 @@ escape_tube = room {
     obj = { 
         xact('hatch', 'It is airtight'),
         xact('hatch_handle', code[[
-            if not disabled(path('Down')) then
+            if not forward_passage:disabled() then
                 p "You close the hatch."
-                path('Down'):disable()
+                forward_passage:disable()
             else
                 p "You open the hatch."
-                path('Down'):enable()
+                forward_passage:enable()
                 lifeon(poison, 5)
             end
         ]]),
         'screwdriver',
     },
-    way = {
-        vroom('Down', 'forward_passage'):disable(),
+    kway = {
+        kroom('forward_passage', 'd'):disable(),
     },
-    kbd = function(s, down, key)
-        if down and key == 'd' and not disabled(path('Down')) then
-            walk('forward_passage');
-        end
-    end
 };
 
 fan_room = room {
@@ -210,8 +202,8 @@ fan_room = room {
     obj = {
         'traitor',
     },
-    way = {
-        'missile_control', -- E
+    kway = {
+        kroom('missile_control', 'e'),
     },
     entered = function(s)
         if traitor.alive then
@@ -245,7 +237,6 @@ fan_room = room {
 
 forward_passage = room {
     nam = 'Forward passage',
-    dsc = [[forward_passage]],
     obj = {
         obj {
             nam = 'door',
@@ -273,12 +264,12 @@ forward_passage = room {
             end,
         },
     },
-    way = {
-        vroom('Up', 'escape_tube'),
-        vroom('Down', 'crews_quarters'),
-        'access_tunnel', -- N
-        'long_corridor', -- S
-        'captains_quarters', -- W
+    kway = {
+        kroom('escape_tube', 'u'),
+        kroom('crews_quarters', 'd'),
+        kroom('access_tunnel', 'n'),
+        kroom('long_corridor', 's'),
+        kroom('captains_quarters', 'w'),
     },
 }
 
@@ -287,8 +278,8 @@ galley = room {
     obj = {
         'knife',
     },
-    way = {
-        'crews_quarters', -- W
+    kway = {
+        kroom('crews_quarters', 'w'),
     },
 }
 
@@ -325,11 +316,11 @@ long_corridor = room {
     nam = 'Long corridor',
     obj = {
     },
-    way = {
-        'forward_passage', -- N
-        'sonar_station', -- E
-        'command_station', -- S
-        'radio_room', -- W
+    kway = {
+        kroom('forward_passage', 'n'),
+        kroom('sonar_station', 'e'),
+        kroom('command_station', 's'),
+        kroom('radio_room', 'w'),
     },
 }
 
@@ -358,9 +349,9 @@ lower_missile_bay = room {
             end,
         },
     },
-    way = {
-        'missile_control', -- N
-        vroom('Up', 'upper_missile_bay'),
+    kway = {
+        kroom('missile_control', 'n'),
+        kroom('upper_missile_bay', 'u'),
     },
 }:disable();
 
@@ -411,12 +402,12 @@ missile_control = room {
             end,
         },
     },
-    way = {
-        vroom('Up', 'command_station'),
-        'crews_quarters', -- N
-        'equipment_bay', -- E
-        'lower_missile_bay', -- S
-        'fan_room', -- W
+    kway = {
+        kroom('command_station', 'u'),
+        kroom('crews_quarters', 'n'),
+        kroom('equipment_bay', 'e'),
+        kroom('lower_missile_bay', 's'),
+        kroom('fan_room', 'w'),
     },
 }
 
@@ -435,8 +426,8 @@ navigation_center = room {
             dsc = "Tactics {manual}",
         },
     },
-    way = {
-        'command_station', -- W
+    kway = {
+        kroom('command_station', 'w'),
     },
 }
 
@@ -445,8 +436,8 @@ radio_room = room {
     obj = {
         'cable_cutters',
     },
-    way = {
-        'long_corridor', -- E
+    kway = {
+        kroom('long_corridor', 'e'),
     },
 }
 
@@ -456,9 +447,9 @@ shower_stalls = room {
         'grate',
         'shampoo',
     },
-    way = {
-        'crews_quarters', -- E
-         'ventilation_duct', -- N
+    kway = {
+        kroom('crews_quarters', 'e'),
+        kroom('ventilation_duct', 'n'),
     },
 }
 
@@ -483,8 +474,8 @@ sonar_sphere = room {
             end,
         },
     },
-    way = {
-        'access_tunnel', -- S
+    kway = {
+        kroom('access_tunnel', 's'),
     },
 }
 
@@ -500,8 +491,8 @@ sonar_station = room {
             dsc = "Green {button}",
         },
     },
-    way = {
-        'long_corridor', -- W
+    kway = {
+        kroom('long_corridor', 'w'),
     },
 }
 
@@ -510,9 +501,9 @@ torpedo_room = room {
     obj = {
         'wrench',
     },
-    way = {
-        'crews_quarters', -- S
-        'weapons_locker', -- E
+    kway = {
+        kroom('crews_quarters', 's'),
+        kroom('weapons_locker', 'e'),
     },
 }
 
@@ -549,8 +540,8 @@ upper_missile_bay = room {
             end,
         },
     },
-    way = {
-        vroom('Down', 'lower_missile_bay'),
+    kway = {
+        kroom('lower_missile_bay', 'd'),
     },
 }
 
@@ -570,8 +561,8 @@ ventilation_duct = room {
             end,
         }
     },
-    way = {
-        'shower_stalls', -- N
+    kway = {
+        kroom('shower_stalls', 'n'),
     },
 }:disable();
 
@@ -580,8 +571,8 @@ weapons_locker = room {
     obj = {
         'gas_mask',
     },
-    way = {
-        'torpedo_room', -- W
+    kway = {
+        kroom('torpedo_room', 'w'),
     },
 }
 
@@ -632,7 +623,7 @@ enemy = obj {
         if s.timer > 0 then
             s.timer = s.timer - 1
         end
-        --p(tostring(s.timer))
+        -- p(tostring(s.timer))
         -- p(tostring(depth_gauge.depth))
         if s.timer == 0 and depth_gauge.depth == 0 then
             if here() ~= dead then
