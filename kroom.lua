@@ -2,21 +2,13 @@
 
 stead.module_init(function()
     input.key = stead.hook(input.key, function(f, s, down, key, ...)
-        if input._key_hooks[key] then
+        if input._kroom_key_hooks[key] then
             input.key_event = { key = key, down = down };
             return 'user_kbd_kroom'
         end
         return f(s, down, key, ...)
     end)
-    input._key_hooks = {}
-    --[[ enable key_hooks in kroom() - allows other directions too
-    input._key_hooks['n'] = true; -- North
-    input._key_hooks['s'] = true; -- South
-    input._key_hooks['e'] = true; -- East
-    input._key_hooks['w'] = true; -- West
-    input._key_hooks['u'] = true; -- Up
-    input._key_hooks['d'] = true; -- Down
-    --]]
+    input._kroom_key_hooks = {}
 end)
 
 stead.kroom = function(where, direction)
@@ -26,7 +18,7 @@ stead.kroom = function(where, direction)
     if direction == nil then
         return stead.deref(where)
     end
-    input._key_hooks[direction] = true;
+    input._kroom_key_hooks[direction] = true;
     return obj {
         nam = where,
         kroom_type = true,
@@ -60,7 +52,7 @@ room = stead.inherit(room, function(v)
             end
             for i,v in ipairs(s.kway) do
                 if v.kroom_type then
-                    stead.table.insert(s.way, v.where)
+                    stead.list_add(s.way, v.where)
                     if v:disabled() then
                         -- a disabled kroom is a shortcut to disable the destination room
                         -- so move the disabled state to that room
