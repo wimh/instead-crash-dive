@@ -257,32 +257,7 @@ fan_room = room {
 forward_passage = room {
     nam = 'Forward passage',
     obj = {
-        obj {
-            nam = 'door',
-            dsc = function(s)
-                if captains_quarters:disabled() then
-                    p 'There is a closed {door}'
-                else
-                    p 'There is an open {door}'
-                end
-            end,
-            act = function(s)
-                if captains_quarters:disabled() then
-                    p 'The lock is very secure, you cannot open it.'
-                else
-                    p 'There lock is broken'
-                end
-            end,
-            used = function(s, w)
-                if w == key then
-                    p "Key won't fit"
-                elseif w == pistol then
-                    set_sound('snd/163456__lemudcrab__pistol-shot.ogg')
-                    captains_quarters:enable()
-                    p "Lock destroyed!"
-                end
-            end,
-        },
+        'door',
     },
     kway = {
         kroom('escape_tube', 'u'),
@@ -656,6 +631,35 @@ depth_gauge = obj {
     end,
 }
 
+door = obj {
+    nam = 'door',
+    dsc = function(s)
+        if captains_quarters:disabled() then
+            p 'There is a closed {door}'
+        else
+            p 'There is an open {door}'
+        end
+    end,
+    act = function(s)
+        if captains_quarters:disabled() then
+            p 'The lock is very secure, you cannot open it.'
+        else
+            p 'There lock is broken'
+        end
+    end,
+    used = function(s, w)
+        if w == key then
+            p "Key won't fit"
+        elseif w == pistol and pistol.bullet then
+            set_sound('snd/163456__lemudcrab__pistol-shot.ogg')
+            captains_quarters:enable()
+            pistol.bullet = false
+            p 'BANG!';
+            p "Lock destroyed!"
+        end
+    end,
+}
+
 enemy = obj {
     nam = 'Enemy',
     var {
@@ -755,7 +759,7 @@ pistol = obj {
     use = function(s, w)
         if not s.bullet then
             p "The pistol does not have any bullets left."
-        else
+        elseif w ~= door then
             set_sound('snd/163456__lemudcrab__pistol-shot.ogg')
             s.bullet = false
             p 'BANG!';
