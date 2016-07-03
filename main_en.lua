@@ -583,12 +583,12 @@ ventilation_duct = room {
             nam = 'duct',
             dsc = 'There is a {duct} down to the fan room.',
             used = function(s,w)
+                drop(w, fan_room)
                 if w == sonarunit then
-                    drop(w, fan_room)
                     traitor.alive = false
                     place(pistol, fan_room)
-                    p 'It falls down to the fan room.'
                 end
+                p 'It falls down to the fan room.'
             end,
         }
     },
@@ -901,6 +901,12 @@ traitor = obj {
             p "He looks dangerous"
         else
             p "He is dead"
+        end
+    end,
+    used = function(s, w)
+        if s.alive and here() ~= dead then
+            walkin('dead')
+            p "The traitor shoots you and kills you instantly!"
         end
     end,
 }
