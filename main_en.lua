@@ -47,6 +47,7 @@ about = room {
             Additional objects were added to allow multiple interactions on a single object. 
             The original game uses North, South, West and East for movement. 
             Now the room names are used, but the original keys still work if a keyboard is connected. 
+            The original game limits the number of items which can be carried to 6. This limit has been removed.
           ]],
     kway = {
         kroom(vroom('Back to main menu', 'main'), 'd'),
@@ -128,15 +129,6 @@ congratulations = room {
     nam = 'Congratulations',
     hideinv = true,
     dsc = "mission accomplished",
-}
-
-credits = room {
-    nam = 'Credits',
-    dsc = [[]],
-    kway = {
-        kroom(vroom('Back to main menu', 'main'), 'u'),
-    },
-    hideinv = true,
 }
 
 crews_quarters = room {
@@ -386,15 +378,17 @@ main = room {
     kway = {
         kroom(vroom('^Start game^', 'intro'), 'n'),
         kroom(vroom('^About original game^', 'about'), 'd'),
-        kroom(vroom('^Credits^', 'credits'), 'u'),
     },
+    dsc = [[
+        Credits^^
+        • Original game «Crash Dive!» by Brian Moriarty^
+    ]],
     obj = {
         obj {
             nam = "back",
             dsc = txtc("{Back to language selection}"),
             act = function(s)
                 gamefile('main.lua')
-                p ""
             end,
         }
     },
@@ -486,7 +480,7 @@ shower_stalls = room {
     },
     kway = {
         kroom('crews_quarters', 'e'),
-        kroom('ventilation_duct', 'n'),
+        kroom('ventilation_duct', 's'),
     },
 }
 
@@ -616,7 +610,9 @@ weapons_locker = room {
 -- OBJECTS
 
 cable_cutters = obj {
-    nam = 'Cable cutters',
+    nam = 'Cable cutter',
+    dsc = 'There is a {cable cutter}',
+    tak = 'you take the cable cutter',
 }
 
 card = obj {
@@ -710,7 +706,7 @@ key = obj {
 }:disable();
 
 knife = obj {
-    nam = 'knife',
+    nam = 'Knife',
     dsc = 'there is a dull {knife}',
     tak = 'You take the knife.',
     inv = 'Dull knife',
@@ -729,7 +725,7 @@ periscope = obj {
 }
 
 pistol = obj {
-    nam = 'pistol',
+    nam = 'Pistol',
     var {
         bullet = true;
     },
