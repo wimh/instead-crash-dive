@@ -486,8 +486,13 @@ sonar_sphere = room {
             end,
             used = function(s, w)
                 if w == cable_cutters then
-                    sonarunit.connected = false
-                    p "You have cut the power cable."
+                    if scanner.active then
+                        walkin('dead')
+                        p "A jolt of high voltage kills you instantly!"
+                    else
+                        sonarunit.connected = false
+                        p "You have cut the power cable."
+                    end
                 end
             end,
         },
@@ -500,13 +505,19 @@ sonar_sphere = room {
 sonar_station = room {
     nam = 'Sonar station',
     obj = {
-        obj{
-            nam = "Blank scanner",
-            dsc = "Blank {scanner}",
-        },
+        'scanner',
         obj{
             nam = "Green button",
             dsc = "Green {button}",
+            act = function(s)
+                if scanner.active then
+                    scanner.active = false
+                    p "scanner deactivated"
+                else
+                    scanner.active = true
+                    p "scanner activated"
+                end
+            end,
         },
     },
     kway = {
@@ -884,6 +895,29 @@ red_button = obj {
             p 'sub dives'
         end
     ]],
+}
+
+scanner = obj {
+    nam = "Scanner",
+    var {
+        -- in the original game it is inactive by default
+        -- if it is active, an additional step is required to solve the game
+        active = true;
+    },
+    dsc = function(s)
+        if s.active then
+            p "Active {scanner}"
+        else
+            p "Blank {scanner}"
+        end
+    end,
+    act = function(s)
+        if s.active then
+            p "Enemy approaching!!!"
+        else
+            p "it is blank"
+        end
+    end,
 }
 
 security_id = obj {
