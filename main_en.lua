@@ -177,10 +177,12 @@ escape_tube = room {
             dsc = "It has a {handle} to open it.",
             act = function(s) 
                 if not forward_passage:disabled() then
+                    set_sound('snd/264060__paul368__sfx-door-close-big.ogg')
                     p "You close the hatch."
                     forward_passage:disable()
                     -- closing it does not remove the gas already here ;)
                 else
+                    set_sound('snd/264061__paul368__sfx-door-open.ogg')
                     p "You open the hatch."
                     forward_passage:enable()
                     poison.escaped = true
@@ -245,6 +247,7 @@ fan_room = room {
             s.countdown = s.countdown - 1
         end
         if s.countdown == 0 then
+            set_sound('snd/163456__lemudcrab__pistol-shot.ogg')
             walkin('dead')
             p "The traitor shoots you and kills you instantly!"
         end
@@ -274,6 +277,7 @@ forward_passage = room {
                 if w == key then
                     p "Key won't fit"
                 elseif w == pistol then
+                    set_sound('snd/163456__lemudcrab__pistol-shot.ogg')
                     captains_quarters:enable()
                     p "Lock destroyed!"
                 end
@@ -382,6 +386,13 @@ main = room {
     dsc = [[
         Credits^^
         • Original game «Crash Dive!» by Brian Moriarty^
+        • Dropped stuff by Enma-Darei from freesound.org (CC-0)^
+        • SUBMARINE DIVE ALARM by U.S. Department of Defense (PD)^
+        • Pistol Shot by LeMudCrab from freesound.org (CC-0)^
+        • crash.wav by sagetyrtle from freesound.org (CC-0)^
+        • HQ Explosion by Quaker540 from freesound.org (CC-0)^
+        • SFX Door Open.wav by Paul368 from freesound.org (CC-0)^
+        • SFX Door Close Big.wav by Paul368 from freesound.org (CC-0)^
     ]],
     obj = {
         obj {
@@ -425,6 +436,7 @@ missile_control = room {
                 if gl_activated_arming
                         and gl_encrypted_x == gl_destination_x
                         and gl_encrypted_y == gl_destination_y then
+                    set_sound('snd/245372__quaker540__hq-explosion.ogg')
                     walkin('congratulations')
                     p "You have finished this game"
                 else
@@ -583,6 +595,7 @@ ventilation_duct = room {
             nam = 'duct',
             dsc = 'There is a {duct} down to the fan room.',
             used = function(s,w)
+                set_sound('snd/196124__enma-darei__dropped-stuff.ogg')
                 drop(w, fan_room)
                 if w == sonarunit then
                     traitor.alive = false
@@ -635,6 +648,7 @@ depth_gauge = obj {
         if s.depth < 128 then
             s.depth = s.depth + 8
             if s.depth == 128 then
+                set_sound('snd/40158__sagetyrtle__crash.ogg')
                 lifeoff(s)
                 p(txtb('BANG!')..' sub hits bottom')
             end
@@ -742,6 +756,7 @@ pistol = obj {
         if not s.bullet then
             p "The pistol does not have any bullets left."
         else
+            set_sound('snd/163456__lemudcrab__pistol-shot.ogg')
             s.bullet = false
             p 'BANG!';
         end
@@ -858,6 +873,9 @@ red_button = obj {
             lifeoff(depth_gauge)
             p 'sub levels off'
         else
+            if depth_gauge.depth == 0 then
+                set_sound('snd/submarine_dive_horn.ogg')
+            end
             lifeon(depth_gauge, 8)
             p 'sub dives'
         end
@@ -905,6 +923,7 @@ traitor = obj {
     end,
     used = function(s, w)
         if s.alive and here() ~= dead then
+            set_sound('snd/163456__lemudcrab__pistol-shot.ogg')
             walkin('dead')
             p "The traitor shoots you and kills you instantly!"
         end
