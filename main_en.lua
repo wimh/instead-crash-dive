@@ -1,5 +1,5 @@
 -- $Name:Crash Dive!$
--- $Version:0.2.0$
+-- $Version:0.3.0$
 
 -- vim: set fileencoding=utf-8 nobomb foldmethod=syntax nofoldenable foldnestmax=1:
 
@@ -21,7 +21,7 @@ game.codepage="UTF-8"
 function init()
     lifeon(radiation, 4);
     lifeon(poison, 5)
-end; 
+end;
 
 global {
     -- result will be 8..128 in steps of 8
@@ -38,15 +38,15 @@ global {
 
 about = room {
     nam = 'About original game',
-    dsc = [[Original game «Crash Dive!» by Brian Moriarty in published in April 
+    dsc = [[Original game «Crash Dive!» by Brian Moriarty in published in April
             1984 issue of Analog Computing magazin for the Atari 8-bit family.^^
-            In the original game commands had to be typed. 
+            In the original game commands had to be typed.
             For example: "EXAMINE SCREWDRIVER".
-            This adaption has been made playable by mouse or touch interface. 
+            This adaption has been made playable by mouse or touch interface.
             That required some changes from the original game.
-            Additional objects were added to allow multiple interactions on a single object. 
-            The original game uses North, South, West and East for movement. 
-            Now the room names are used, but the original keys still work if a keyboard is connected. 
+            Additional objects were added to allow multiple interactions on a single object.
+            The original game uses North, South, West and East for movement.
+            Now the room names are used, but the original keys still work if a keyboard is connected.
             The original game limits the number of items which can be carried to 6. This limit has been removed.
           ]],
     kway = {
@@ -98,7 +98,7 @@ captains_quarters = room {
         },
         obj {
             nam = "Suicide note",
-            dsc = "a suicide {note}",
+            dsc = "There is a suicide {note}.",
         },
         'security_id',
     },
@@ -106,11 +106,6 @@ captains_quarters = room {
         kroom('forward_passage', 'e'),
     },
 }:disable();
-
-closed_eyes = room {
-    nam = '',
-    dsc = [[You can't see anything!]],
-};
 
 command_station = room {
     nam = 'Command station',
@@ -166,16 +161,16 @@ escape_tube = room {
     entered = function(s)
         lifeon(enemy, 6);
     end,
-    obj = { 
+    obj = {
         obj {
             nam = "hatch",
             dsc = "There is a {hatch} in the floor.",
-            act = 'It is airtight',
+            act = 'It is airtight.',
         },
         obj {
             nam = "handle",
             dsc = "It has a {handle} to open it.",
-            act = function(s) 
+            act = function(s)
                 if not forward_passage:disabled() then
                     set_sound('snd/264060__paul368__sfx-door-close-big.ogg')
                     p "You close the hatch."
@@ -192,7 +187,7 @@ escape_tube = room {
         obj {
             nam = "hero",
             dsc = "In the shiny metal you see {yourself}.",
-            act = function(s) 
+            act = function(s)
               if poison.holdbreathtimer > 0 then
                   poison.holdbreathtimer = 0
                   p [[You start breathing again.]]
@@ -283,8 +278,8 @@ intro = room {
     dsc = [[You're on maintenance duty aboard the USS Sea Moss, patrolling the icy North Atlantic waters
             with an arsenal of twenty nuclear missiles. ^^
 
-            The Sea Moss is no ordinary sub. She's the first to carry the Navy's new experimental 
-            sonar-jammer that can make her "invisible" to even the most sophisticated enemy sensors. The 
+            The Sea Moss is no ordinary sub. She's the first to carry the Navy's new experimental
+            sonar-jammer that can make her "invisible" to even the most sophisticated enemy sensors. The
             50-kiloton cruisers in her missile bay are the pride of the Pentagon: fast, silent, incredibly
             accurate. ^^
 
@@ -296,7 +291,7 @@ intro = room {
             The intercom in the equipment bay clicks to life. "I've got a bad line in the forward escape
             tube," a voice from the command deck crackles. "Wanna come up here and take a look at it?"
             You grab a screwdriver, scoot up a ladder and slam the hatch of the escape tube behind you.
-            It's all over in a few seconds. The General Quarters klaxxon blares to life. You hear the 
+            It's all over in a few seconds. The General Quarters klaxxon blares to life. You hear the
             shrieks and choked coughing of friends as they stumble through the passages outside, and a
             single hoarse shout: "Gas!" Some poor sucker pounds weakly on the escape hatch. Then the alarm
             cuts off as suddenly as it began. Everything is silent as death. Frozen with fear, you sit
@@ -328,12 +323,12 @@ lower_missile_bay = room {
             nam = "arming switch",
             dsc = function (s)
                 if gl_activated_arming then
-                    p "Activated arming {switch}."
+                    p "You see an activated arming {switch}."
                 else
-                    p "locked arming {switch}."
+                    p "You see a locked arming {switch}."
                 end
             end,
-            act = "lock is very secure",
+            act = "The lock is very secure.",
             used = function(s, w)
                 if w == key then
                     gl_activated_arming = not gl_activated_arming
@@ -375,6 +370,7 @@ main = room {
             dsc = txtc("{Back to language selection}"),
             act = function(s)
                 gamefile('main.lua')
+                p "" -- avoid the "Nothing happens"
             end,
         }
     },
@@ -406,7 +402,7 @@ missile_control = room {
         },
         obj {
             nam = 'white button',
-            dsc = "There is a {white button}",
+            dsc = "There is a {white button}.",
             act = function(s)
                 if gl_activated_arming
                         and gl_encrypted_x == gl_destination_x
@@ -434,14 +430,14 @@ navigation_center = room {
     obj = {
         obj{
             nam = "Digital display",
-            dsc = "Digital {display}",
+            dsc = "You see a digital {display}.",
             act = function(s)
                 p('X='..tostring(gl_encrypted_x)..' Y='..tostring(gl_encrypted_y))
             end,
         },
         obj{
             nam = "Tactics manual",
-            dsc = "Tactics {manual}",
+            dsc = "There is a {tactics manual}.",
         },
     },
     kway = {
@@ -479,9 +475,9 @@ sonar_sphere = room {
             nam = 'cable',
             dsc = function(s)
                 if sonarunit.connected then
-                    p 'a {power cable}'
+                    p 'There is a {power cable} connected to the sonar unit.'
                 else
-                    p 'a severed {power cable}'
+                    p 'There is a severed {power cable}.'
                 end
             end,
             used = function(s, w)
@@ -508,7 +504,7 @@ sonar_station = room {
         'scanner',
         obj{
             nam = "Green button",
-            dsc = "Green {button}",
+            dsc = "There is a green {button}.",
             act = function(s)
                 if scanner.active then
                     scanner.active = false
@@ -541,14 +537,14 @@ upper_missile_bay = room {
     obj = {
         obj {
             nam = "Digital display",
-            dsc = "Digital {display}",
+            dsc = "You see a digital {display}.",
             act = function(s)
                 p('X='..tostring(gl_destination_x)..' Y='..tostring(gl_destination_y))
             end,
         },
         obj {
             nam = "Gold Button",
-            dsc = "Gold {Button}",
+            dsc = "There is a Gold {Button}.",
             act = function(s)
                 gl_destination_x = gl_destination_x + 8
                 if gl_destination_x > 128 then
@@ -559,7 +555,7 @@ upper_missile_bay = room {
         },
         obj {
             nam = "Silver button",
-            dsc = "Silver {button}",
+            dsc = "There is a silver {button}.",
             act = function(s)
                 gl_destination_y = gl_destination_y - 8
                 if gl_destination_y < 0 then
@@ -610,15 +606,15 @@ weapons_locker = room {
 
 cable_cutters = obj {
     nam = 'Cable cutter',
-    dsc = 'There is a {cable cutter}',
-    tak = 'you take the cable cutter',
+    dsc = 'There is a {cable cutter}.',
+    tak = 'You take the cable cutter.',
 }
 
 card = obj {
-    nam = 'card',
-    dsc = "there is a {card}",
-    tak = 'you take the card.',
-    inv = "it's the Ace of Spades!",
+    nam = 'Card',
+    dsc = "There is a {card}.",
+    tak = 'You take the card.',
+    inv = "It's the Ace of Spades!",
 }
 
 depth_gauge = obj {
@@ -626,9 +622,9 @@ depth_gauge = obj {
     var {
         depth = 0,
     },
-    dsc = 'There is a {depth gauge} at the wall',
+    dsc = 'There is a {depth gauge} at the wall.',
     act = function(s)
-        p(tostring(s.depth)..' fathoms') 
+        p(tostring(s.depth)..' fathoms')
     end,
     life = function(s)
         if s.depth < 128 then
@@ -636,7 +632,7 @@ depth_gauge = obj {
             if s.depth == 128 then
                 set_sound('snd/40158__sagetyrtle__crash.ogg')
                 lifeoff(s)
-                p(txtb('BANG!')..' sub hits bottom')
+                p(txtb('BANG!')..' The sub hits the bottom of the sea.')
             end
         end
     end,
@@ -646,21 +642,21 @@ door = obj {
     nam = 'door',
     dsc = function(s)
         if captains_quarters:disabled() then
-            p 'There is a closed {door}'
+            p 'There is a closed {door}.'
         else
-            p 'There is an open {door}'
+            p 'There is an open {door}.'
         end
     end,
     act = function(s)
         if captains_quarters:disabled() then
             p 'The lock is very secure, you cannot open it.'
         else
-            p 'There lock is broken'
+            p 'The lock is broken.'
         end
     end,
     used = function(s, w)
         if w == key then
-            p "Key won't fit"
+            p "The key won't fit."
         elseif w == pistol and pistol.bullet then
             set_sound('snd/163456__lemudcrab__pistol-shot.ogg')
             captains_quarters:enable()
@@ -700,21 +696,21 @@ gas_mask = obj {
             p 'There is a {Gas mask} on the floor.'
         end
     ]],
-    tak = 'You wear the Gas mask',
+    tak = 'You wear the Gas mask.',
     inv = function (s)
         drop(s)
-        p 'You drop the Gas mask'
+        p 'You drop the Gas mask.'
     end,
 }
 
 grate = obj {
     nam = 'Grate',
-    dsc = 'there is a {grate} on the wall towards the stern of the sub',
+    dsc = 'There is a {grate} on the wall towards the stern of the sub.',
     act = function(s)
         if ventilation_duct:disabled() then
-            p 'it is screwed in place'
+            p 'It is screwed in place.'
         else
-            p 'it is open'
+            p 'It is open.'
         end
     end,
     used = function(s, w)
@@ -729,14 +725,14 @@ grate = obj {
 
 key = obj {
     nam = 'Key',
-    dsc = "a {key}",
-    tak = "you take the key",
+    dsc = "There is a {key}.",
+    tak = "You take the key.",
     inv = "Key",
 }:disable();
 
 knife = obj {
     nam = 'Knife',
-    dsc = 'there is a dull {knife}',
+    dsc = 'There is a dull {knife}.',
     tak = 'You take the knife.',
     inv = 'Dull knife',
 }
@@ -746,9 +742,9 @@ periscope = obj {
     dsc = 'there is a {periscope} coming out of the roof.',
     act = function(s)
         if depth_gauge.depth == 0 then
-            p(txtb('^The enemy is approaching!!!!!!!!!^'))
+            p(txtb('^The enemy is approaching on a ship!!!!!!!!!^'))
         else
-            p 'You can only see water'
+            p 'You can only see water.'
         end
     end,
 }
@@ -759,12 +755,12 @@ pistol = obj {
         bullet = true;
     },
     dsc = 'There is a {pistol} lying on the floor.',
-    tak = "I take the pistol",
+    tak = "You take the pistol.",
     inv = function(s)
         if s.bullet then
-            p "It has only one bullet"
+            p "It has only one bullet."
         else
-            p "It does not have any bullets"
+            p "It does not have any bullets."
         end
     end,
     use = function(s, w)
@@ -810,21 +806,19 @@ sonarunit = obj {
     },
     dsc =  function(s)
         if s.rusty then
-            p 'a bolted-down radioactive {sonar unit}.'
+            p 'There is a bolted-down radioactive {sonar unit}.'
         else
-            p 'a radioactive glowing {sonar unit}.'
+            p 'There is a radioactive glowing {sonar unit}.'
         end
     end,
     act =  function(s)
-        if s.rusty then
-            p 'The bolts are tight and rusty.'
-        elseif s.bolted then
-            p "The bolts won't let you pick it up"
+        if s.bolted then
+            p "The bolts won't let you pick it up."
         elseif s.connected then
-            p "It is connected to the cable"
+            p "It is connected to the cable."
         else
             take(s)
-            p "you picked up the radioactive sonar unit"
+            p "You picked up the radioactive sonar unit."
         end
     end,
     inv = function (s)
@@ -835,14 +829,14 @@ sonarunit = obj {
         if w == shampoo then
             s.rusty = false
             remove(w, me())
-            p "shampoo all used up."
+            p "Shampoo all used up."
         end
         if w == wrench then
             if s.rusty then
-                p "the bolts are too tight and rusty"
+                p "The bolts are too tight and rusty."
             else
                 s.bolted = false
-                p "you have removed the bolts"
+                p "You have removed the bolts."
             end
         end
     end,
@@ -864,16 +858,16 @@ radiation = obj {
 
 radiation_suit = obj {
     nam = 'Radiation suit',
-    dsc = 'There is a {radiation suit}',
-    tak = 'You wear the radiation suit',
+    dsc = 'There is a {radiation suit}.',
+    tak = 'You wear the radiation suit.',
     inv = function (s)
         if key:disabled() then
             key:enable()
             place(key)
-            p "You found a key"
+            p "You found a key!"
         else
             drop(s)
-            p 'You drop the radiation suit'
+            p 'You drop the radiation suit.'
         end
     end,
 }
@@ -883,16 +877,16 @@ red_button = obj {
     dsc = 'with a {Red button} next to it.',
     act = code[[
         if depth_gauge.depth == 128 then
-            p 'nothing happens'
+            p 'Nothing happens.'
         elseif live(depth_gauge) then
             lifeoff(depth_gauge)
-            p 'sub levels off'
+            p 'Sub levels off.'
         else
             if depth_gauge.depth == 0 then
                 set_sound('snd/submarine_dive_horn.ogg')
             end
             lifeon(depth_gauge, 8)
-            p 'sub dives'
+            p 'Sub dives.'
         end
     ]],
 }
@@ -906,38 +900,38 @@ scanner = obj {
     },
     dsc = function(s)
         if s.active then
-            p "Active {scanner}"
+            p "You see an active {scanner}."
         else
-            p "Blank {scanner}"
+            p "You see a blank {scanner}."
         end
     end,
     act = function(s)
         if s.active then
-            p "Enemy approaching!!!"
+            p "The enemy is approaching on a ship!!!"
         else
-            p "it is blank"
+            p "It is blank."
         end
     end,
 }
 
 security_id = obj {
     nam = "Security ID",
-    dsc = "You found a {Security ID}",
+    dsc = "You found a {Security ID}.",
     tak = "You take the Secutity ID.",
 }:disable();
 
 screwdriver = obj {
     nam = 'Tiny screwdriver',
     dsc = 'There is a tiny {screwdriver}.',
-    tak = 'You picked up the tiny screwdriver',
-    inv = 'seems ordiary',
+    tak = 'You pick up the tiny screwdriver.',
+    inv = 'Seems ordinary.',
 }
 
 shampoo = obj {
     nam = 'Shampoo',
-    dsc = 'There is a bottle of {shampoo}',
-    tak = 'You take the bottle',
-    inv = 'Looks like normal shampoo',
+    dsc = 'There is a bottle of {shampoo}.',
+    tak = 'You take the bottle.',
+    inv = 'It is heavy duty shampoo.',
 }
 
 traitor = obj {
@@ -954,9 +948,9 @@ traitor = obj {
     end,
     act =  function(s)
         if s.alive then
-            p "He looks dangerous"
+            p "He is wearing a gas mask and looks dangerous."
         else
-            p "He is dead"
+            p "He is dead."
         end
     end,
     used = function(s, w)
@@ -970,6 +964,6 @@ traitor = obj {
 
 wrench = obj {
     nam = 'Wrench',
-    dsc = 'a {wrench}',
-    tak = 'you take the wrench',
+    dsc = 'There is a {wrench}.',
+    tak = 'You take the wrench.',
 }
