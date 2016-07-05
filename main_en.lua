@@ -697,10 +697,6 @@ gas_mask = obj {
         end
     ]],
     tak = 'You wear the Gas mask.',
-    inv = function (s)
-        drop(s)
-        p 'You drop the Gas mask.'
-    end,
 }
 
 grate = obj {
@@ -798,7 +794,7 @@ poison = obj {
 }
 
 sonarunit = obj {
-    nam = 'Radioactive sonar unit',
+    nam = 'Sonar unit',
     var {
         rusty = true,
         bolted = true,
@@ -821,10 +817,7 @@ sonarunit = obj {
             p "You picked up the radioactive sonar unit."
         end
     end,
-    inv = function (s)
-        drop(s)
-        p 'You have dropped the sonar unit.'
-    end,
+    inv = 'It is glowing!',
     used = function(s, w)
         if w == shampoo then
             s.rusty = false
@@ -865,9 +858,6 @@ radiation_suit = obj {
             key:enable()
             place(key)
             p "You found a key!"
-        else
-            drop(s)
-            p 'You drop the radiation suit.'
         end
     end,
 }
