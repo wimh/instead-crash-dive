@@ -209,7 +209,6 @@ escape_tube = room {
     },
     kway = {
         kroom('forward_passage', DOWN):disable(),
-        'congratulations',
     },
 };
 
