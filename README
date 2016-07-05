@@ -1,0 +1,17 @@
+Crash Dive! is a classic adventure game for the INSTEAD interactive fiction engine.
+
+For more info about INSTEAD, see
+ * https://github.com/instead-hub/instead
+ * http://instead.syscall.ru
+
+To install this game you must copy all files in a subdirectory of the INSTEAD games directory:
+ * For windows users this directory is inside INSTEAD application directory.
+ * For linux systems this is ~/.instead/games.
+ * For android this is /sdcard/instead/appdata/games.
+
+Languages available:
+ * English
+
+TODO:
+ * Some objects need a description which will also add hints how to solve it. (note, manual)
+ * Add graphics
