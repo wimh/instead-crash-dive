@@ -1,6 +1,11 @@
 -- partly based on module kbd
 
 stead.module_init(function()
+    -- fix compatibility with android version (1.6.1)
+    if stead.list_add == nil then
+        stead.list_add = list_add
+    end
+
     input.key = stead.hook(input.key, function(f, s, down, key, ...)
         if input._kroom_key_hooks[key] then
             input.key_event = { key = key, down = down };

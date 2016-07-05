@@ -3,7 +3,7 @@
 
 -- vim: set fileencoding=utf-8 nobomb:
 
-instead_version '1.9.1'
+instead_version '1.6.1'
 
 main = room {
     nam = 'Crash Dive!';

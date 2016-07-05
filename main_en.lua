@@ -3,7 +3,7 @@
 
 -- vim: set fileencoding=utf-8 nobomb foldmethod=syntax nofoldenable foldnestmax=1:
 
-instead_version '1.9.1'
+instead_version '1.6.1'
 
 --require 'dbg'
 
@@ -209,6 +209,7 @@ escape_tube = room {
     },
     kway = {
         kroom('forward_passage', DOWN):disable(),
+        'congratulations',
     },
 };
 
@@ -792,7 +793,7 @@ poison = obj {
                 p [[You are no longer able to hold your breath.^]]
             end
         end
-        if poison.escaped and s.holdbreathtimer == 0 and not have(gas_mask) then
+        if poison.escaped and s.holdbreathtimer == 0 and not have(gas_mask) and not gas_mask:disabled() then
             if here() ~= dead then
                 walkin('dead')
                 p "A cloud of poisonous gas kills you instantly!"
@@ -846,7 +847,7 @@ sonarunit = obj {
 radiation = obj {
     nam = 'Radiation',
     life = function(s)
-        if where(sonarunit) == nil and not have(sonarunit) then
+        if where(sonarunit) == nil and not have(sonarunit) and not sonarunit:disabled() then
             move('sonarunit', 'sonar_sphere', 'sonar_sphere'); -- fix where()
         end
         if (here() == where(sonarunit) or have(sonarunit)) and not have(radiation_suit) then
