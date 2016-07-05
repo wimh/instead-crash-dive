@@ -34,6 +34,14 @@ global {
     gl_activated_arming = false,
 }
 
+-- direction keys which can be used to move between rooms
+UP = 'u';
+DOWN = 'd';
+NORTH = 'n';
+SOUTH = 's';
+EAST = 'e';
+WEST = 'w';
+
 -- ROOMS
 
 about = room {
@@ -50,7 +58,7 @@ about = room {
             The original game limits the number of items which can be carried to 6. This limit has been removed.
           ]],
     kway = {
-        kroom(vroom('Back to main menu', 'main'), 'd'),
+        kroom(vroom('Back to main menu', 'main'), DOWN),
     },
     hideinv = true,
 };
@@ -65,8 +73,8 @@ access_tunnel = room {
         },
     },
     kway = {
-        kroom('sonar_sphere', 'n'),
-        kroom('forward_passage', 's'),
+        kroom('sonar_sphere', NORTH),
+        kroom('forward_passage', SOUTH),
     },
 }
 
@@ -77,7 +85,7 @@ ballast_control = room {
         'red_button',
     },
     kway = {
-        kroom('command_station', 'e'),
+        kroom('command_station', EAST),
     }
 }
 
@@ -103,7 +111,7 @@ captains_quarters = room {
         'security_id',
     },
     kway = {
-        kroom('forward_passage', 'e'),
+        kroom('forward_passage', EAST),
     },
 }:disable();
 
@@ -113,10 +121,10 @@ command_station = room {
         'periscope',
     },
     kway = {
-        kroom('missile_control', 'd'),
-        kroom('long_corridor', 'n'),
-        kroom('navigation_center', 'e'),
-        kroom('ballast_control', 'w'),
+        kroom('missile_control', DOWN),
+        kroom('long_corridor', NORTH),
+        kroom('navigation_center', EAST),
+        kroom('ballast_control', WEST),
     },
 }
 
@@ -132,11 +140,11 @@ crews_quarters = room {
         'card',
     },
     kway = {
-        kroom('forward_passage', 'u'),
-        kroom('torpedo_room', 'n'),
-        kroom('galley', 'e'),
-        kroom('missile_control', 's'),
-        kroom('shower_stalls', 'w'),
+        kroom('forward_passage', UP),
+        kroom('torpedo_room', NORTH),
+        kroom('galley', EAST),
+        kroom('missile_control', SOUTH),
+        kroom('shower_stalls', WEST),
     },
 }
 
@@ -151,7 +159,7 @@ equipment_bay = room {
         'radiation_suit',
     },
     kway = {
-        kroom('missile_control', 'w'),
+        kroom('missile_control', WEST),
     },
 }
 
@@ -200,7 +208,7 @@ escape_tube = room {
         'screwdriver',
     },
     kway = {
-        kroom('forward_passage', 'd'):disable(),
+        kroom('forward_passage', DOWN):disable(),
     },
 };
 
@@ -216,7 +224,7 @@ fan_room = room {
         'traitor',
     },
     kway = {
-        kroom('missile_control', 'e'),
+        kroom('missile_control', EAST),
     },
     entered = function(s)
         if traitor.alive then
@@ -255,11 +263,11 @@ forward_passage = room {
         'door',
     },
     kway = {
-        kroom('escape_tube', 'u'),
-        kroom('crews_quarters', 'd'),
-        kroom('access_tunnel', 'n'),
-        kroom('long_corridor', 's'),
-        kroom('captains_quarters', 'w'),
+        kroom('escape_tube', UP),
+        kroom('crews_quarters', DOWN),
+        kroom('access_tunnel', NORTH),
+        kroom('long_corridor', SOUTH),
+        kroom('captains_quarters', WEST),
     },
 }
 
@@ -269,7 +277,7 @@ galley = room {
         'knife',
     },
     kway = {
-        kroom('crews_quarters', 'w'),
+        kroom('crews_quarters', WEST),
     },
 }
 
@@ -299,7 +307,7 @@ intro = room {
             whoever shut off the alarm. ^^
           ]],
     kway = {
-        kroom(vroom('Start', 'escape_tube'), 'n'),
+        kroom(vroom('Start', 'escape_tube'), NORTH),
     },
     hideinv = true,
 };
@@ -309,10 +317,10 @@ long_corridor = room {
     obj = {
     },
     kway = {
-        kroom('forward_passage', 'n'),
-        kroom('sonar_station', 'e'),
-        kroom('command_station', 's'),
-        kroom('radio_room', 'w'),
+        kroom('forward_passage', NORTH),
+        kroom('sonar_station', EAST),
+        kroom('command_station', SOUTH),
+        kroom('radio_room', WEST),
     },
 }
 
@@ -342,16 +350,16 @@ lower_missile_bay = room {
         },
     },
     kway = {
-        kroom('missile_control', 'n'),
-        kroom('upper_missile_bay', 'u'),
+        kroom('missile_control', NORTH),
+        kroom('upper_missile_bay', UP),
     },
 }:disable();
 
 main = room {
     nam = 'Crash Dive!',
     kway = {
-        kroom(vroom('^Start game^', 'intro'), 'n'),
-        kroom(vroom('^About original game^', 'about'), 'd'),
+        kroom(vroom('^Start game^', 'intro'), NORTH),
+        kroom(vroom('^About original game^', 'about'), DOWN),
     },
     dsc = [[
         Credits^^
@@ -417,11 +425,11 @@ missile_control = room {
         },
     },
     kway = {
-        kroom('command_station', 'u'),
-        kroom('crews_quarters', 'n'),
-        kroom('equipment_bay', 'e'),
-        kroom('lower_missile_bay', 's'),
-        kroom('fan_room', 'w'),
+        kroom('command_station', UP),
+        kroom('crews_quarters', NORTH),
+        kroom('equipment_bay', EAST),
+        kroom('lower_missile_bay', SOUTH),
+        kroom('fan_room', WEST),
     },
 }
 
@@ -441,7 +449,7 @@ navigation_center = room {
         },
     },
     kway = {
-        kroom('command_station', 'w'),
+        kroom('command_station', WEST),
     },
 }
 
@@ -451,7 +459,7 @@ radio_room = room {
         'cable_cutters',
     },
     kway = {
-        kroom('long_corridor', 'e'),
+        kroom('long_corridor', EAST),
     },
 }
 
@@ -462,8 +470,8 @@ shower_stalls = room {
         'shampoo',
     },
     kway = {
-        kroom('crews_quarters', 'e'),
-        kroom('ventilation_duct', 's'),
+        kroom('crews_quarters', EAST),
+        kroom('ventilation_duct', SOUTH),
     },
 }
 
@@ -494,7 +502,7 @@ sonar_sphere = room {
         },
     },
     kway = {
-        kroom('access_tunnel', 's'),
+        kroom('access_tunnel', SOUTH),
     },
 }
 
@@ -517,7 +525,7 @@ sonar_station = room {
         },
     },
     kway = {
-        kroom('long_corridor', 'w'),
+        kroom('long_corridor', WEST),
     },
 }
 
@@ -527,8 +535,8 @@ torpedo_room = room {
         'wrench',
     },
     kway = {
-        kroom('crews_quarters', 's'),
-        kroom('weapons_locker', 'e'),
+        kroom('crews_quarters', SOUTH),
+        kroom('weapons_locker', EAST),
     },
 }
 
@@ -566,7 +574,7 @@ upper_missile_bay = room {
         },
     },
     kway = {
-        kroom('lower_missile_bay', 'd'),
+        kroom('lower_missile_bay', DOWN),
     },
 }
 
@@ -588,7 +596,7 @@ ventilation_duct = room {
         }
     },
     kway = {
-        kroom('shower_stalls', 'n'),
+        kroom('shower_stalls', NORTH),
     },
 }:disable();
 
@@ -598,7 +606,7 @@ weapons_locker = room {
         'gas_mask',
     },
     kway = {
-        kroom('torpedo_room', 'w'),
+        kroom('torpedo_room', WEST),
     },
 }
 
