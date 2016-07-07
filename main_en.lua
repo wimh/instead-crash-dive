@@ -107,6 +107,7 @@ captains_quarters = room {
         obj {
             nam = "Suicide note",
             dsc = "There is a suicide {note}.",
+            act = [[I can no longer live with my terrible secret. May the devil have mercy on my soul.]],
         },
         'security_id',
     },
@@ -446,6 +447,14 @@ navigation_center = room {
         obj{
             nam = "Tactics manual",
             dsc = "There is a {tactics manual}.",
+            act = function(s)
+                p(txtc(txtb("THIS DOCUMENT IS CLASSIFIED TOP SECRET^")))
+                p([[^
+                    ...a pair of coordinates designated X and Y. These are automatically scrambled
+                    by the Delta-Q Encoder so that they bear no obvious relation to the latitude and
+                    langitude readings which they represent...^
+                ]])
+            end,
         },
     },
     kway = {
