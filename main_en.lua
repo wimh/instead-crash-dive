@@ -1,5 +1,5 @@
 -- $Name:Crash Dive!$
--- $Version:0.3.0$
+-- $Version:1.0.0$
 
 -- vim: set fileencoding=utf-8 nobomb foldmethod=syntax nofoldenable foldnestmax=1:
 
