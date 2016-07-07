@@ -1,11 +1,6 @@
 -- partly based on module kbd
 
 stead.module_init(function()
-    -- fix compatibility with android version (1.6.1)
-    if stead.list_add == nil then
-        stead.list_add = list_add
-    end
-
     input.key = stead.hook(input.key, function(f, s, down, key, ...)
         if input._kroom_key_hooks[key] then
             input.key_event = { key = key, down = down };
@@ -57,7 +52,7 @@ room = stead.inherit(room, function(v)
             end
             for i,v in ipairs(s.kway) do
                 if v.kroom_type then
-                    stead.list_add(s.way, v.where)
+                    s.way:add(v.where)
                     if v:disabled() then
                         -- a disabled kroom is a shortcut to disable the destination room
                         -- so move the disabled state to that room
@@ -65,7 +60,7 @@ room = stead.inherit(room, function(v)
                         v:enable()
                     end
                 else
-                    stead.table.insert(s.way, v)
+                    s.way:add(v)
                 end
             end
         end
