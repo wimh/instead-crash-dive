@@ -365,6 +365,7 @@ main = room {
     dsc = [[
         Credits^^
         • Original game «Crash Dive!» by Brian Moriarty^
+        • Startup illustration from ANALOG computing magazine #18^
         • Dropped stuff by Enma-Darei from freesound.org (CC-0)^
         • SUBMARINE DIVE ALARM by U.S. Department of Defense (PD)^
         • Pistol Shot by LeMudCrab from freesound.org (CC-0)^

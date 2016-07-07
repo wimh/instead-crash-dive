@@ -7,6 +7,7 @@ instead_version '1.6.1'
 
 main = room {
     nam = 'Crash Dive!';
+    pic = 'images/title.png',
     forcedsc = true,
     dsc = function(s)
         if     LANG == 'ru' then p [[Выберите язык игры:]];
